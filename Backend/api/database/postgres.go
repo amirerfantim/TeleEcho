@@ -80,3 +80,18 @@ func CheckPassword(username string, hashedPassword string) (*model.User, error) 
 	}
 	return &user, nil
 }
+func DeleteUserByUserID(userID uint) error {
+	var user model.User
+	if err := DB.First(&user, userID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return NotFoundUser
+		}
+		logrus.Printf("Error while querying basket: %s", err)
+		return err
+	}
+	if err := DB.Delete(&user, userID).Error; err != nil {
+		logrus.Printf("Can not remove basket with this id: %s", err)
+		return err
+	}
+	return nil
+}

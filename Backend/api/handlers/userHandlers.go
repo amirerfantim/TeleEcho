@@ -7,9 +7,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 	"time"
@@ -81,6 +83,29 @@ func Login(c echo.Context) error {
 	}
 
 }
+func DeleteUser(c echo.Context) error {
+	userID := c.Get("id").(string)
+	userIDInt, err := strconv.ParseUint(userID, 10, 0)
+	if err != nil {
+		fmt.Printf("Error while parsing user id:%s\n", err)
+		return c.JSON(http.StatusBadRequest, "User id is wrong")
+	}
+	err = database.DeleteUserByUserID(uint(userIDInt))
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"error": fmt.Sprintf("User with ID %d not found", userIDInt),
+			})
+		} else {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"error": "Failed to retrieve basket",
+			})
+		}
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
 func generateJWT(userID uint) (string, error) {
 	claims := &jwt.StandardClaims{
 		Subject:   strconv.Itoa(int(userID)),

@@ -2,6 +2,7 @@ package router
 
 import (
 	"TeleEcho/api/handlers"
+	myMiddleware "TeleEcho/middleware"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -14,8 +15,10 @@ func New() *echo.Echo {
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE, echo.PATCH},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
-	userGroup := e.Group("/user")
-	userGroup.POST("/register", handlers.RegisterUser)
-	userGroup.POST("/login", handlers.Login)
+	e.POST("/register", handlers.RegisterUser)
+	e.POST("/login", handlers.Login)
+	userGroup := e.Group("/users", myMiddleware.ValidateJWT)
+	userGroup.DELETE("", handlers.DeleteUser)
+
 	return e
 }
