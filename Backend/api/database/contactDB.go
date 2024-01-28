@@ -47,3 +47,22 @@ func DeleteUserContact(userID uint, contactUserID uint) error {
 	logrus.Printf("Contact with ContactUserID %d for UserID %d deleted successfully", contactUserID, userID)
 	return nil
 }
+func UpdateContactStatus(userID uint, contactUserID uint, newStatus model.Status) error {
+	var contact model.Contact
+	err := DB.Where("user_id = ? AND contact_user_id = ?", userID, contactUserID).First(&contact).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			logrus.Printf("No contact found with UserID %d and ContactUserID %d", userID, contactUserID)
+			return NotFoundContact
+		}
+		logrus.Printf("Error retrieving contact: %s", err)
+		return err
+	}
+	contact.Status = newStatus
+	if err := DB.Save(&contact).Error; err != nil {
+		logrus.Printf("Error updating status for contact with UserID %d and ContactUserID %d: %s", userID, contactUserID, err)
+		return err
+	}
+	logrus.Printf("Contact status updated successfully for UserID %d and ContactUserID %d", userID, contactUserID)
+	return nil
+}

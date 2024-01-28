@@ -80,3 +80,39 @@ func DeleteContact(c echo.Context) error {
 		return c.JSON(http.StatusNoContent, "")
 	}
 }
+func ChangeContentStatus(c echo.Context) error {
+	userID := c.Get("id").(string)
+	userIDInt, err := strconv.ParseUint(userID, 10, 0)
+	if err != nil {
+		fmt.Printf("Error while parsing user id:%s\n", err)
+		return c.JSON(http.StatusBadRequest, "User id is wrong")
+	}
+	username := c.FormValue("username")
+	contact, err := database.GetUserByUsername(username)
+	if err != nil {
+		if errors.Is(err, database.NotFoundUser) {
+			return c.JSON(http.StatusBadRequest, fmt.Sprintf("No user found with username %s", username))
+		}
+		return c.JSON(http.StatusInternalServerError, "Error while finding user")
+	}
+	newStatus := c.FormValue("status")
+	var status model.Status
+	if newStatus == "blocked" {
+		status.IsBlocked = true
+	}
+	if newStatus == "hide profile" {
+		status.ProfilePictureHide = true
+	}
+	if newStatus == "hide phone" {
+		status.PhoneNumberHide = true
+	}
+	err = database.UpdateContactStatus(uint(userIDInt), contact.ID, status)
+	if err != nil {
+		if errors.Is(err, database.NotFoundContact) {
+			return c.JSON(http.StatusBadRequest, fmt.Sprintf("No contact found with username %s for user ID %d", contact.ID, userIDInt))
+		}
+		return c.JSON(http.StatusInternalServerError, "Error while deleting contact")
+	} else {
+		return c.JSON(http.StatusNoContent, "")
+	}
+}
