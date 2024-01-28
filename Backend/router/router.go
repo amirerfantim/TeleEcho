@@ -22,5 +22,8 @@ func New() *echo.Echo {
 	userGroup.GET("", handlers.GetUserInformation)
 	userGroup.PATCH("", handlers.UpdateUserInformation)
 
+	contactGroup := e.Group("/contacts", myMiddleware.ValidateJWT)
+	contactGroup.POST("", handlers.CreateContact)
+
 	return e
 }
