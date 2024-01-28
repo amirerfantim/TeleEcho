@@ -23,6 +23,10 @@ const RegisterForm = () => {
     });
 
     const formRef = useRef<HTMLFormElement>(null);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -30,6 +34,9 @@ const RegisterForm = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setErrorMessage('');
+        setSuccessMessage('');
+
 
         if (formRef.current) {
             const formDataObj = new FormData(formRef.current);
@@ -42,20 +49,25 @@ const RegisterForm = () => {
             formDataObj.append('bio', formData.bio);
 
             try {
-                // Replace with your API endpoint
                 const response = await fetch('http://127.0.0.1:8020/user/register', {
                     method: 'POST',
                     body: formDataObj
                 });
                 const data = await response.json();
                 console.log(data);
-                // Handle successful response
+
+                if (response.ok) {
+                    setSuccessMessage('User created successfully');
+                } else {
+                    setErrorMessage(data);
+                }
             } catch (error) {
                 console.error(error);
-                // Handle error
+                setErrorMessage('An error occurred while registering the user.');
             }
         }
     };
+
 
     return (
         <div className="container mt-5">
@@ -102,6 +114,18 @@ const RegisterForm = () => {
                                     <textarea className="form-control" id="bio" name="bio" value={formData.bio} onChange={handleChange}
                                               rows={3}></textarea>
                                 </div>
+
+                                {successMessage && (
+                                    <div className="alert alert-success" role="alert">
+                                        {successMessage}
+                                    </div>
+                                )}
+                                {errorMessage && (
+                                    <div className="alert alert-danger" role="alert">
+                                        {errorMessage}
+                                    </div>
+                                )}
+
                                 <button type="submit" className="btn btn-primary">Submit</button>
                             </form>
                         </div>
@@ -110,6 +134,7 @@ const RegisterForm = () => {
             </div>
         </div>
     );
+
 };
 
 export default RegisterForm;
