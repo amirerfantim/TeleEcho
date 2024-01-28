@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Correctly import useNavigate
-import './LoginForm.css'; // Make sure this CSS file is in the correct directory
+import { useNavigate } from 'react-router-dom';
+import './LoginForm.css';
 
 const LoginForm = () => {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
     const [errorMessage, setErrorMessage] = useState('');
-    const navigate = useNavigate(); // Correctly initialize navigate using useNavigate
+    const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -26,11 +26,9 @@ const LoginForm = () => {
             const data = await response.json();
 
             if (response.ok) {
-                // Store the received token and redirect the user
                 localStorage.setItem('token', data.token);
-                navigate('/dashboard'); // Use navigate to redirect to the dashboard
+                navigate('/dashboard');
             } else {
-                // Set the error message from the response
                 setErrorMessage(data);
             }
         } catch (error) {

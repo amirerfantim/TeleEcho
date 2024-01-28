@@ -1,5 +1,4 @@
 
-/* Background and General Styling */
 body {
     background-color: #f4f7f6;
     font-family: 'Arial', sans-serif;
@@ -10,7 +9,6 @@ body {
     padding-top: 50px;
 }
 
-/* Card Styling */
 .card {
     background: white;
     border-radius: 8px;
@@ -38,7 +36,6 @@ body {
     transition: background-color 0.3s;
 }
 
-/* Form Field Styling */
 .form-control {
     border: none;
     border-bottom: 2px solid #ddd;
@@ -53,7 +50,6 @@ body {
     border-bottom-color: #007bff;
 }
 
-/* Button Styling */
 .btn {
     padding: 10px 20px;
     border-radius: 5px;
@@ -83,7 +79,6 @@ body {
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Alert Message Styling */
 .alert {
     margin-bottom: 20px;
     padding: 10px;
@@ -104,7 +99,6 @@ body {
     border-color: #f5c6cb;
 }
 
-/* Animation for Form Fields */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -127,9 +121,8 @@ body {
     animation-delay: 0.4s;
 }
 
-/* Custom button container */
 .button-container {
     display: flex;
-    justify-content: center; /* Center the buttons horizontally */
-    gap: 15px; /* Adds space between the buttons */
+    justify-content: center;
+    gap: 15px;
 }

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './RegisterForm.css'; // Ensure this CSS file is in the same directory
+import './RegisterForm.css';
 
 interface FormData {
     username: string;
@@ -52,7 +52,7 @@ const RegisterForm = () => {
 
                 if (response.ok) {
                     setSuccessMessage('User created successfully. Redirecting to login...');
-                    setTimeout(() => navigate('/login'), 2000); // Redirect after 2 seconds
+                    setTimeout(() => navigate('/login'), 2000);
                 } else {
                     setErrorMessage(data);
                 }
