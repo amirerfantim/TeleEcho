@@ -26,6 +26,7 @@ func New() *echo.Echo {
 	contactGroup.POST("", handlers.CreateContact)
 	contactGroup.GET("", handlers.GetUserContacts)
 	contactGroup.DELETE("", handlers.DeleteContact)
+	contactGroup.PATCH("", handlers.DeleteContact)
 
 	return e
 }
