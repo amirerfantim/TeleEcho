@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import axios from 'axios';
+import './RegisterForm.css'; // Ensure this CSS file is in the same directory
 
 interface FormData {
     username: string;
@@ -30,6 +30,7 @@ const RegisterForm = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
         if (formRef.current) {
             const formDataObj = new FormData(formRef.current);
             formDataObj.append('username', formData.username);
@@ -41,12 +42,13 @@ const RegisterForm = () => {
             formDataObj.append('bio', formData.bio);
 
             try {
-                const response = await axios.post('http://127.0.0.1:8020/user/register', formDataObj, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
+                // Replace with your API endpoint
+                const response = await fetch('http://127.0.0.1:8020/user/register', {
+                    method: 'POST',
+                    body: formDataObj
                 });
-                console.log(response.data);
+                const data = await response.json();
+                console.log(data);
                 // Handle successful response
             } catch (error) {
                 console.error(error);
@@ -57,45 +59,55 @@ const RegisterForm = () => {
 
     return (
         <div className="container mt-5">
-            <h2>Register</h2>
-            <form ref={formRef} onSubmit={handleSubmit} className="mt-4">
-                <div className="mb-3">
-                    <label htmlFor="username" className="form-label">Username</label>
-                    <input type="text" className="form-control" id="username" name="username" value={formData.username}
-                           onChange={handleChange} required/>
+            <div className="row justify-content-center">
+                <div className="col-md-6">
+                    <div className="card">
+                        <div className="card-header">
+                            <h2>Register</h2>
+                        </div>
+                        <div className="card-body">
+                            <form ref={formRef} onSubmit={handleSubmit}>
+                                <div className="mb-3">
+                                    <label htmlFor="username" className="form-label">Username</label>
+                                    <input type="text" className="form-control" id="username" name="username" value={formData.username}
+                                           onChange={handleChange} required/>
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="firstname" className="form-label">First Name</label>
+                                    <input type="text" className="form-control" id="firstname" name="firstname"
+                                           value={formData.firstname} onChange={handleChange} required/>
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="lastname" className="form-label">Last Name</label>
+                                    <input type="text" className="form-control" id="lastname" name="lastname" value={formData.lastname}
+                                           onChange={handleChange} required/>
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="phone" className="form-label">Phone</label>
+                                    <input type="tel" className="form-control" id="phone" name="phone" value={formData.phone}
+                                           onChange={handleChange} required/>
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="password" className="form-label">Password</label>
+                                    <input type="password" className="form-control" id="password" name="password"
+                                           value={formData.password} onChange={handleChange} required/>
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="profile" className="form-label">Profile Picture URL</label>
+                                    <input type="text" className="form-control" id="profile" name="profile" value={formData.profile}
+                                           onChange={handleChange}/>
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="bio" className="form-label">Bio</label>
+                                    <textarea className="form-control" id="bio" name="bio" value={formData.bio} onChange={handleChange}
+                                              rows={3}></textarea>
+                                </div>
+                                <button type="submit" className="btn btn-primary">Submit</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="firstname" className="form-label">First Name</label>
-                    <input type="text" className="form-control" id="firstname" name="firstname"
-                           value={formData.firstname} onChange={handleChange} required/>
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="lastname" className="form-label">Last Name</label>
-                    <input type="text" className="form-control" id="lastname" name="lastname" value={formData.lastname}
-                           onChange={handleChange} required/>
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="phone" className="form-label">Phone</label>
-                    <input type="tel" className="form-control" id="phone" name="phone" value={formData.phone}
-                           onChange={handleChange} required/>
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Password</label>
-                    <input type="password" className="form-control" id="password" name="password"
-                           value={formData.password} onChange={handleChange} required/>
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="profile" className="form-label">Profile Picture URL</label>
-                    <input type="text" className="form-control" id="profile" name="profile" value={formData.profile}
-                           onChange={handleChange}/>
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="bio" className="form-label">Bio</label>
-                    <textarea className="form-control" id="bio" name="bio" value={formData.bio} onChange={handleChange}
-                              rows={3}></textarea>
-                </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
-            </form>
+            </div>
         </div>
     );
 };
