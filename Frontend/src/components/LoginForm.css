@@ -1,128 +1,130 @@
 
-body {
-    background-color: #f4f7f6;
+/* General page styling */
+body, html {
+    height: 100%;
+    margin: 0;
     font-family: 'Arial', sans-serif;
-    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.container {
-    padding-top: 50px;
-}
-
+/* Form Card Styling */
 .card {
+    width: 400px;
+    padding: 2rem;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
 }
 
 .card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
 }
 
-.card-header {
-    background-color: #007bff;
-    color: white;
-    text-align: center;
-    font-size: 24px;
-    font-weight: 700;
-    padding: 20px 0;
-}
-
-.card-body {
-    padding: 20px;
-    transition: background-color 0.3s;
-}
-
+/* Form Styling */
 .form-control {
-    border: none;
-    border-bottom: 2px solid #ddd;
-    border-radius: 0;
-    padding: 10px 15px;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
+    border: 2px solid #e7e7e7;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    transition: border-color 0.3s ease;
 }
 
 .form-control:focus {
     outline: none;
-    border-bottom-color: #007bff;
+    border-color: #667eea;
+    animation: input-focus 2s ease infinite;
 }
 
+/* Button Styling */
 .btn {
-    padding: 10px 20px;
-    border-radius: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: bold;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    font-size: 16px;
-    width: 150px;
-    height: 50px;
-    display: inline-block;
+    border: none;
+    color: white;
 }
 
 .btn-primary {
-    background-color: #007bff;
+    background: #667eea; /* Primary button color */
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    background: #5a67d8; /* Darken color on hover */
 }
 
-.btn-success {
-    background-color: #28a745;
+.btn-secondary {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
 }
 
-.btn-success:hover {
-    background-color: #218838;
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+.btn-secondary:hover {
+    background: white;
+    color: #667eea;
 }
 
-.alert {
-    margin-bottom: 20px;
-    padding: 10px;
-    border-radius: 5px;
-    opacity: 0.9;
-    text-align: center;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border-color: #c3e6cb;
-}
-
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border-color: #f5c6cb;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.form-control {
-    animation: fadeInUp 0.5s ease-out forwards;
-}
-
-.form-control:nth-child(odd) {
-    animation-delay: 0.2s;
-}
-.form-control:nth-child(even) {
-    animation-delay: 0.4s;
-}
-
+/* Button container styling */
 .button-container {
     display: flex;
-    justify-content: center;
-    gap: 15px;
+    justify-content: center; /* Center the buttons with space around them */
+    gap: 20px; /* Increased gap between buttons */
+}
+
+/* Input focus animation */
+@keyframes input-focus {
+    0% {
+        border-color: #667eea;
+    }
+    50% {
+        border-color: #764ba2;
+    }
+    100% {
+        border-color: #667eea;
+    }
+}
+
+/* Logo and title styles */
+.logo {
+    background: url('../assets/messanger_logo.png') no-repeat center center;
+    background-size: contain;
+    height: 100px; /* Adjust as needed */
+    margin-bottom: 1rem;
+}
+
+.title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .card {
+        width: 90%;
+    }
+
+    .button-container {
+        flex-direction: column; /* Stack buttons vertically on smaller screens */
+        align-items: center; /* Center buttons vertically */
+    }
+
+    .btn {
+        width: 100%; /* Full width buttons on smaller screens */
+        margin-top: 10px; /* Add some margin to the top of each button */
+    }
+
+    .btn:first-child {
+        margin-top: 0; /* No top margin for the first button */
+    }
 }

@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './LoginForm.css';
+import './LoginForm.css'; // Make sure this CSS file is in the same directory
 
 const LoginForm = () => {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
@@ -26,8 +27,9 @@ const LoginForm = () => {
             const data = await response.json();
 
             if (response.ok) {
+                // Store the received token and redirect the user
                 localStorage.setItem('token', data.token);
-                navigate('/dashboard');
+                navigate('/dashboard'); // Redirect to the dashboard or home page
             } else {
                 setErrorMessage(data);
             }
@@ -38,54 +40,23 @@ const LoginForm = () => {
     };
 
     return (
-        <div className="container mt-5">
-            <div className="row justify-content-center">
-                <div className="col-md-6">
-                    <div className="card">
-                        <div className="card-header">
-                            <h2>Login</h2>
-                        </div>
-                        <div className="card-body">
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-3">
-                                    <label htmlFor="username" className="form-label">Username</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="username"
-                                        name="username"
-                                        value={credentials.username}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="password" className="form-label">Password</label>
-                                    <input
-                                        type="password"
-                                        className="form-control"
-                                        id="password"
-                                        name="password"
-                                        value={credentials.password}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                {errorMessage && (
-                                    <div className="alert alert-danger" role="alert">
-                                        {errorMessage}
-                                    </div>
-                                )}
-                                <div className="button-container">
-                                    <button type="submit" className="btn btn-primary">Submit</button>
-                                    <button type="button" className="btn btn-success"
-                                            onClick={() => navigate('/Register')}>Register
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+        <div className="container">
+            <div className="card">
+                <div className="logo"></div>
+                <h1 className="title">Login</h1>
+                <form onSubmit={handleSubmit}>
+                    <input type="text" className="form-control" name="username" value={credentials.username} onChange={handleChange} placeholder="Username" required />
+                    <input type="password" className="form-control" name="password" value={credentials.password} onChange={handleChange} placeholder="Password" required />
+                    <div className="button-container">
+                        <button type="submit" className="btn btn-primary">Login</button>
+                        <button type="button" className="btn btn-secondary" onClick={() => navigate('/register')}>Register</button>
                     </div>
-                </div>
+                    {errorMessage && (
+                        <div className="alert alert-danger" role="alert">
+                            {errorMessage}
+                        </div>
+                    )}
+                </form>
             </div>
         </div>
     );
