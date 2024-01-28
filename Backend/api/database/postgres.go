@@ -90,7 +90,7 @@ func DeleteUserByUserID(userID uint) error {
 		return err
 	}
 	if err := DB.Delete(&user, userID).Error; err != nil {
-		logrus.Printf("Can not remove basket with this id: %s", err)
+		logrus.Printf("Can not remove user with this id: %s", err)
 		return err
 	}
 	return nil
@@ -101,8 +101,27 @@ func GetUserByUserID(userID uint) (*model.User, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, NotFoundUser
 		}
-		logrus.Printf("Error while querying basket: %s", err)
+		logrus.Printf("Error while querying user: %s", err)
 		return nil, err
 	}
 	return &user, nil
+}
+
+func UpdateUserByUserID(userID uint, userUpdates model.User) error {
+	var existingUser model.User
+	if err := DB.First(&existingUser, userID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return NotFoundUser
+		}
+		logrus.Printf("Error while querying user: %s", err)
+		return err
+	}
+
+	if err := DB.Model(&existingUser).Updates(userUpdates).Error; err != nil {
+		logrus.Printf("Error while updating user: %s", err)
+		return err
+	}
+	logrus.Printf("User updated successfully")
+
+	return nil
 }

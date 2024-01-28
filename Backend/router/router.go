@@ -20,6 +20,7 @@ func New() *echo.Echo {
 	userGroup := e.Group("/users", myMiddleware.ValidateJWT)
 	userGroup.DELETE("", handlers.DeleteUser)
 	userGroup.GET("", handlers.GetUserInformation)
+	userGroup.PATCH("", handlers.UpdateUserInformation)
 
 	return e
 }

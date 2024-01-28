@@ -118,7 +118,7 @@ func GetUserInformation(c echo.Context) error {
 
 	user, err := database.GetUserByUserID(uint(userIDInt))
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, database.NotFoundUser) {
 			return c.JSON(http.StatusNotFound, map[string]interface{}{
 				"error": fmt.Sprintf("User with ID %d not found", userIDInt),
 			})
@@ -149,9 +149,98 @@ func GetUserInformation(c echo.Context) error {
 		return c.JSON(http.StatusOK, user)
 
 	}
+}
+func UpdateUserInformation(c echo.Context) error {
+	userID := c.Get("id").(string)
+	userIDInt, err := strconv.ParseUint(userID, 10, 0)
+	if err != nil {
+		fmt.Printf("Error while parsing user id:%s\n", err)
+		return c.JSON(http.StatusBadRequest, "User id is wrong")
+	}
+	user, err := database.GetUserByUserID(uint(userIDInt))
+	if err != nil {
+		if errors.Is(err, database.NotFoundUser) {
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"error": fmt.Sprintf("User with ID %d not found", userIDInt),
+			})
+		} else {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"error": "Failed to retrieve user",
+			})
+		}
+	}
+	username := c.FormValue("username")
+	if username != "" {
+		usernameOK := database.IsUsernameDuplicate(username)
+		if usernameOK {
+			user.Username = username
+		} else {
+			return c.JSON(http.StatusBadRequest, "Your username has already been used")
+		}
+	}
+	firstname := c.FormValue("firstname")
+	if firstname != "" {
+		user.Firstname = firstname
+	}
+	logrus.Printf(firstname)
+	lastname := c.FormValue("lastname")
+	if lastname != "" {
+		user.Lastname = lastname
+	}
+	phone := c.FormValue("phone")
+	if phone != "" {
+		phoneNumberOK := database.IsPhoneDuplicate(phone)
+		if phoneNumberOK {
+			user.Phone = phone
+		} else {
+			return c.JSON(http.StatusBadRequest, "Your phone number has already been used")
+		}
+	}
+	password := c.FormValue("password")
+	if password != "" {
+		if len(password) < 8 {
+			return c.JSON(http.StatusBadRequest, "Password is too easy")
+		} else {
+			hashFunc := sha256.New()
+			hashFunc.Write([]byte(password))
+			hashPassword := hex.EncodeToString(hashFunc.Sum(nil))
+			user.Password = hashPassword
+		}
+	}
+
+	profilePicture, err := c.FormFile("profile")
+	if err != nil {
+		logrus.Printf("Unable to open image\n")
+		return c.JSON(http.StatusBadRequest, "Unable to open file")
+	}
+	if profilePicture != nil {
+		profilePath, err := services.UploadS3(services.StorageSession, profilePicture, configs.Config.StorageServiceBucket, username)
+		if err != nil {
+			logrus.Printf("Unable to upload image\n")
+			return c.String(http.StatusInternalServerError, "Unable to upload profile picture")
+		}
+		user.ProfilePicture = profilePath
+	}
+	bio := c.FormValue("bio")
+	if bio != "" {
+		user.Bio = bio
+	}
+	err = database.UpdateUserByUserID(uint(userIDInt), *user)
+	if err != nil {
+		logrus.Printf("Error while updating user:%s\n", err)
+		if errors.Is(err, database.NotFoundUser) {
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"error": fmt.Sprintf("User with ID %d not found", userIDInt),
+			})
+		} else {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"error": "Failed to update user",
+			})
+		}
+	}
+	return c.JSON(http.StatusOK, "User updated successfully")
 
 }
-
 func generateJWT(userID uint) (string, error) {
 	claims := &jwt.StandardClaims{
 		Subject:   strconv.Itoa(int(userID)),
