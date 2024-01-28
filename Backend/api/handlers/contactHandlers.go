@@ -38,3 +38,20 @@ func CreateContact(c echo.Context) error {
 		return c.JSON(http.StatusCreated, "Contact created successfully")
 	}
 }
+func GetUserContacts(c echo.Context) error {
+	userID := c.Get("id").(string)
+	userIDInt, err := strconv.ParseUint(userID, 10, 0)
+	if err != nil {
+		fmt.Printf("Error while parsing user id:%s\n", err)
+		return c.JSON(http.StatusBadRequest, "User id is wrong")
+	}
+	contacts, err := database.GetUserContacts(uint(userIDInt))
+	if err != nil {
+		if errors.Is(err, database.NotFoundContact) {
+			return c.JSON(http.StatusOK, []model.Contact{})
+		}
+		return c.JSON(http.StatusInternalServerError, "Error while querying contact")
+	} else {
+		return c.JSON(http.StatusOK, contacts)
+	}
+}

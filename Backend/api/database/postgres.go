@@ -11,6 +11,7 @@ import (
 
 var DB *gorm.DB
 var NotFoundUser = errors.New("user not found")
+var NotFoundContact = errors.New("contact not found")
 var UnauthorizedChatAccess = errors.New("unauthorized access to the chat")
 var IncorrectPassword = errors.New("incorrect password")
 
