@@ -25,6 +25,7 @@ func New() *echo.Echo {
 	contactGroup := e.Group("/contacts", myMiddleware.ValidateJWT)
 	contactGroup.POST("", handlers.CreateContact)
 	contactGroup.GET("", handlers.GetUserContacts)
+	contactGroup.DELETE("", handlers.DeleteContact)
 
 	return e
 }

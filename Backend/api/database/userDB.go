@@ -85,6 +85,17 @@ func GetUserByPhone(phone string) (*model.User, error) {
 	}
 	return &user, nil
 }
+func GetUserByUsername(username string) (*model.User, error) {
+	var user model.User
+	if err := DB.Where("username = ?", username).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, NotFoundUser
+		}
+		logrus.Printf("Error while querying user by username: %s", err)
+		return nil, err
+	}
+	return &user, nil
+}
 
 func UpdateUserByUserID(userID uint, userUpdates model.User) error {
 	var existingUser model.User

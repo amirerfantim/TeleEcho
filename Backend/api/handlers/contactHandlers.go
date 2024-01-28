@@ -55,3 +55,28 @@ func GetUserContacts(c echo.Context) error {
 		return c.JSON(http.StatusOK, contacts)
 	}
 }
+func DeleteContact(c echo.Context) error {
+	userID := c.Get("id").(string)
+	userIDInt, err := strconv.ParseUint(userID, 10, 0)
+	if err != nil {
+		fmt.Printf("Error while parsing user id:%s\n", err)
+		return c.JSON(http.StatusBadRequest, "User id is wrong")
+	}
+	username := c.FormValue("username")
+	contact, err := database.GetUserByUsername(username)
+	if err != nil {
+		if errors.Is(err, database.NotFoundUser) {
+			return c.JSON(http.StatusBadRequest, fmt.Sprintf("No user found with username %s", username))
+		}
+		return c.JSON(http.StatusInternalServerError, "Error while finding user")
+	}
+	err = database.DeleteUserContact(uint(userIDInt), contact.ID)
+	if err != nil {
+		if errors.Is(err, database.NotFoundContact) {
+			return c.JSON(http.StatusBadRequest, fmt.Sprintf("No contact found with ContactUserID %d for user ID %d", contact.ID, userIDInt))
+		}
+		return c.JSON(http.StatusInternalServerError, "Error while deleting contact")
+	} else {
+		return c.JSON(http.StatusNoContent, "")
+	}
+}

@@ -29,3 +29,21 @@ func GetUserContacts(userID uint) ([]model.Contact, error) {
 	}
 	return contacts, nil
 }
+func DeleteUserContact(userID uint, contactUserID uint) error {
+	var contact model.Contact
+	err := DB.Where("contact_user_id = ? AND user_id = ?", contactUserID, userID).First(&contact).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			logrus.Printf("No contact found with ContactUserID %d for user ID %d", contactUserID, userID)
+			return NotFoundContact
+		}
+		logrus.Printf("Error retrieving contact for deletion: %s", err)
+		return err
+	}
+	if err := DB.Delete(&contact).Error; err != nil {
+		logrus.Printf("Error deleting contact with ContactUserID %d: %s", contactUserID, err)
+		return err
+	}
+	logrus.Printf("Contact with ContactUserID %d for UserID %d deleted successfully", contactUserID, userID)
+	return nil
+}
