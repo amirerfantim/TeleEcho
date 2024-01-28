@@ -95,3 +95,14 @@ func DeleteUserByUserID(userID uint) error {
 	}
 	return nil
 }
+func GetUserByUserID(userID uint) (*model.User, error) {
+	var user model.User
+	if err := DB.First(&user, userID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, NotFoundUser
+		}
+		logrus.Printf("Error while querying basket: %s", err)
+		return nil, err
+	}
+	return &user, nil
+}

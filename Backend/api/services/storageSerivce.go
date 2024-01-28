@@ -63,7 +63,6 @@ func DownloadS3(sess *session.Session, bucket string, key string) (*os.File, err
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
-
 	_, err = io.Copy(file, obj.Body)
 	if err != nil {
 		logrus.Println("Can not copy file:", err)

@@ -5,6 +5,7 @@ import (
 	"TeleEcho/api/services"
 	"TeleEcho/configs"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -12,7 +13,9 @@ import (
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -36,7 +39,7 @@ func RegisterUser(c echo.Context) error {
 			profilePath, err := services.UploadS3(services.StorageSession, profilePicture, configs.Config.StorageServiceBucket, username)
 			if err != nil {
 				logrus.Printf("Unable to upload image\n")
-				return c.String(http.StatusBadRequest, "Unable to upload first profile picture")
+				return c.String(http.StatusInternalServerError, "Unable to upload profile picture")
 			}
 			hashFunc := sha256.New()
 			hashFunc.Write([]byte(password))
@@ -99,11 +102,54 @@ func DeleteUser(c echo.Context) error {
 			})
 		} else {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"error": "Failed to retrieve basket",
+				"error": "Failed to delete user.",
 			})
 		}
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+func GetUserInformation(c echo.Context) error {
+	userID := c.Get("id").(string)
+	userIDInt, err := strconv.ParseUint(userID, 10, 0)
+	if err != nil {
+		fmt.Printf("Error while parsing user id:%s\n", err)
+		return c.JSON(http.StatusBadRequest, "User id is wrong")
+	}
+
+	user, err := database.GetUserByUserID(uint(userIDInt))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"error": fmt.Sprintf("User with ID %d not found", userIDInt),
+			})
+		} else {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"error": "Failed to retrieve user",
+			})
+		}
+	} else {
+		profilePhotoFile, err := services.DownloadS3(services.StorageSession, configs.Config.StorageServiceBucket, user.ProfilePicture)
+		if err != nil {
+			logrus.Println("Can not download photo:", err)
+			return c.JSON(http.StatusInternalServerError, "Error while downloading photo.")
+		}
+		file, err := os.Open(profilePhotoFile.Name())
+		if err != nil {
+			logrus.Println("Can not open file", err)
+			return c.JSON(http.StatusInternalServerError, "Error while processing photo.")
+		}
+		bytes, err := ioutil.ReadAll(file)
+		if err != nil {
+			logrus.Println("Can not convert photo to bytes.")
+			return c.JSON(http.StatusInternalServerError, "Error while processing photo.")
+		}
+		base64ProfilePicture := base64.StdEncoding.EncodeToString(bytes)
+		user.ProfilePicture = base64ProfilePicture
+
+		return c.JSON(http.StatusOK, user)
+
+	}
+
 }
 
 func generateJWT(userID uint) (string, error) {
