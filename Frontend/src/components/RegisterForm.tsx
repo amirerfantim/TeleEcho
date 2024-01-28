@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './RegisterForm.css'; // Ensure this CSS file is in the same directory
 
 interface FormData {
@@ -22,11 +23,10 @@ const RegisterForm = () => {
         bio: ''
     });
 
-    const formRef = useRef<HTMLFormElement>(null);
-    const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-
-
+    const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
+    const formRef = useRef<HTMLFormElement>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -37,16 +37,11 @@ const RegisterForm = () => {
         setErrorMessage('');
         setSuccessMessage('');
 
-
         if (formRef.current) {
             const formDataObj = new FormData(formRef.current);
-            formDataObj.append('username', formData.username);
-            formDataObj.append('firstname', formData.firstname);
-            formDataObj.append('lastname', formData.lastname);
-            formDataObj.append('phone', formData.phone);
-            formDataObj.append('password', formData.password);
-            formDataObj.append('profile', formData.profile);
-            formDataObj.append('bio', formData.bio);
+            for (const key in formData) {
+                formDataObj.append(key, formData[key as keyof FormData]);
+            }
 
             try {
                 const response = await fetch('http://127.0.0.1:8020/user/register', {
@@ -54,10 +49,10 @@ const RegisterForm = () => {
                     body: formDataObj
                 });
                 const data = await response.json();
-                console.log(data);
 
                 if (response.ok) {
-                    setSuccessMessage('User created successfully');
+                    setSuccessMessage('User created successfully. Redirecting to login...');
+                    setTimeout(() => navigate('/login'), 2000); // Redirect after 2 seconds
                 } else {
                     setErrorMessage(data);
                 }
@@ -81,7 +76,8 @@ const RegisterForm = () => {
                             <form ref={formRef} onSubmit={handleSubmit}>
                                 <div className="mb-3">
                                     <label htmlFor="username" className="form-label">Username</label>
-                                    <input type="text" className="form-control" id="username" name="username" value={formData.username}
+                                    <input type="text" className="form-control" id="username" name="username"
+                                           value={formData.username}
                                            onChange={handleChange} required/>
                                 </div>
                                 <div className="mb-3">
@@ -91,12 +87,14 @@ const RegisterForm = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="lastname" className="form-label">Last Name</label>
-                                    <input type="text" className="form-control" id="lastname" name="lastname" value={formData.lastname}
+                                    <input type="text" className="form-control" id="lastname" name="lastname"
+                                           value={formData.lastname}
                                            onChange={handleChange} required/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="phone" className="form-label">Phone</label>
-                                    <input type="tel" className="form-control" id="phone" name="phone" value={formData.phone}
+                                    <input type="tel" className="form-control" id="phone" name="phone"
+                                           value={formData.phone}
                                            onChange={handleChange} required/>
                                 </div>
                                 <div className="mb-3">
@@ -106,12 +104,14 @@ const RegisterForm = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="profile" className="form-label">Profile Picture URL</label>
-                                    <input type="text" className="form-control" id="profile" name="profile" value={formData.profile}
+                                    <input type="text" className="form-control" id="profile" name="profile"
+                                           value={formData.profile}
                                            onChange={handleChange}/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="bio" className="form-label">Bio</label>
-                                    <textarea className="form-control" id="bio" name="bio" value={formData.bio} onChange={handleChange}
+                                    <textarea className="form-control" id="bio" name="bio" value={formData.bio}
+                                              onChange={handleChange}
                                               rows={3}></textarea>
                                 </div>
 
@@ -126,7 +126,11 @@ const RegisterForm = () => {
                                     </div>
                                 )}
 
-                                <button type="submit" className="btn btn-primary">Submit</button>
+                                <div className="button-container">
+                                    <button type="submit" className="btn btn-primary">Submit</button>
+                                    <button type="button" className="btn btn-success" onClick={() => navigate('/login')}>Login</button>
+                                </div>
+
                             </form>
                         </div>
                     </div>
