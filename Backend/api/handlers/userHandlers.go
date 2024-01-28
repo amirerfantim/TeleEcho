@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"TeleEcho/api/database"
+	"TeleEcho/api/services"
 	"TeleEcho/configs"
 	"crypto/sha256"
 	"encoding/hex"
@@ -20,16 +21,26 @@ func RegisterUser(c echo.Context) error {
 	lastname := c.FormValue("lastname")
 	phone := c.FormValue("phone")
 	password := c.FormValue("password")
-	profilePicture := c.FormValue("profile")
+	profilePicture, err := c.FormFile("profile")
+	if err != nil {
+		logrus.Printf("Unable to open image\n")
+		return c.String(http.StatusBadRequest, "Unable to open file")
+	}
 	bio := c.FormValue("bio")
-	hashFunc := sha256.New()
-	hashFunc.Write([]byte(password))
-	hashPassword := hex.EncodeToString(hashFunc.Sum(nil))
 	usernameOK := database.IsUsernameDuplicate(username)
 	phoneNumberOk := database.IsPhoneDuplicate(phone)
 	if usernameOK {
 		if phoneNumberOk {
-			err := database.CreateUser(username, firstname, lastname, phone, hashPassword, profilePicture, bio)
+			profilePath, err := services.UploadS3(services.StorageSession, profilePicture, configs.Config.StorageServiceBucket, username)
+			if err != nil {
+				logrus.Printf("Unable to upload image\n")
+				return c.String(http.StatusBadRequest, "Unable to upload first profile picture")
+			}
+			hashFunc := sha256.New()
+			hashFunc.Write([]byte(password))
+			hashPassword := hex.EncodeToString(hashFunc.Sum(nil))
+
+			err = database.CreateUser(username, firstname, lastname, phone, hashPassword, profilePath, bio)
 			if err != nil {
 				logrus.Printf("Error creating user:%s\n", err)
 				return c.JSON(http.StatusInternalServerError, "Can not create user")

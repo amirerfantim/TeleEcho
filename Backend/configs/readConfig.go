@@ -7,14 +7,18 @@ import (
 )
 
 type Configuration struct {
-	Port             string `yaml:"port"`
-	Address          string `yaml:"address"`
-	TokenKey         string `yaml:"token-key"`
-	DatabasePort     string `yaml:"database-port"`
-	DatabaseAddress  string `yaml:"database-address"`
-	DatabaseUser     string `yaml:"database-user"`
-	DatabasePassword string `yaml:"database-password"`
-	DatabaseName     string `yaml:"database-name"`
+	Port                   string `yaml:"port"`
+	Address                string `yaml:"address"`
+	TokenKey               string `yaml:"token-key"`
+	DatabasePort           string `yaml:"database-port"`
+	DatabaseAddress        string `yaml:"database-address"`
+	DatabaseUser           string `yaml:"database-user"`
+	DatabasePassword       string `yaml:"database-password"`
+	DatabaseName           string `yaml:"database-name"`
+	StorageServiceID       string `yaml:"storage-service-id"`
+	StorageServiceSecret   string `yaml:"storage-service-secret"`
+	StorageServiceEndpoint string `yaml:"storage-service-endpoint"`
+	StorageServiceBucket   string `yaml:"storage-service-bucket"`
 }
 
 var Config = new(Configuration)
