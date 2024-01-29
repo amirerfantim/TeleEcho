@@ -95,7 +95,7 @@ body, html {
 
 /* Logo and title styles */
 .logo {
-    background: url('../assets/messanger_logo.png') no-repeat center center;
+    background: url('../../assets/messanger_logo.png') no-repeat center center;
     background-size: contain;
     height: 100px; /* Adjust as needed */
     margin-bottom: 1rem;
