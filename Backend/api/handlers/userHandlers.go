@@ -109,46 +109,59 @@ func DeleteUser(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 func GetUserInformation(c echo.Context) error {
-	userID := c.Get("id").(string)
-	userIDInt, err := strconv.ParseUint(userID, 10, 0)
-	if err != nil {
-		fmt.Printf("Error while parsing user id:%s\n", err)
-		return c.JSON(http.StatusBadRequest, "User id is wrong")
-	}
-
-	user, err := database.GetUserByUserID(uint(userIDInt))
-	if err != nil {
-		if errors.Is(err, database.NotFoundUser) {
-			return c.JSON(http.StatusNotFound, map[string]interface{}{
-				"error": fmt.Sprintf("User with ID %d not found", userIDInt),
-			})
+	username := c.FormValue("username")
+	if username == "" {
+		userID := c.Get("id").(string)
+		userIDInt, err := strconv.ParseUint(userID, 10, 0)
+		if err != nil {
+			fmt.Printf("Error while parsing user id:%s\n", err)
+			return c.JSON(http.StatusBadRequest, "User id is wrong")
+		}
+		user, err := database.GetUserByUserID(uint(userIDInt))
+		if err != nil {
+			if errors.Is(err, database.NotFoundUser) {
+				return c.JSON(http.StatusNotFound, map[string]interface{}{
+					"error": fmt.Sprintf("User with ID %d not found", userIDInt),
+				})
+			} else {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"error": "Failed to retrieve user",
+				})
+			}
 		} else {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"error": "Failed to retrieve user",
-			})
+			profilePhotoFile, err := services.DownloadS3(services.StorageSession, configs.Config.StorageServiceBucket, user.ProfilePicture)
+			if err != nil {
+				logrus.Println("Can not download photo:", err)
+				return c.JSON(http.StatusInternalServerError, "Error while downloading photo.")
+			}
+			file, err := os.Open(profilePhotoFile.Name())
+			if err != nil {
+				logrus.Println("Can not open file", err)
+				return c.JSON(http.StatusInternalServerError, "Error while processing photo.")
+			}
+			bytes, err := ioutil.ReadAll(file)
+			if err != nil {
+				logrus.Println("Can not convert photo to bytes.")
+				return c.JSON(http.StatusInternalServerError, "Error while processing photo.")
+			}
+			base64ProfilePicture := base64.StdEncoding.EncodeToString(bytes)
+			user.ProfilePicture = base64ProfilePicture
+
+			return c.JSON(http.StatusOK, user)
+
 		}
+
 	} else {
-		profilePhotoFile, err := services.DownloadS3(services.StorageSession, configs.Config.StorageServiceBucket, user.ProfilePicture)
+		searchedUser, err := database.GetUserByUsername(username)
 		if err != nil {
-			logrus.Println("Can not download photo:", err)
-			return c.JSON(http.StatusInternalServerError, "Error while downloading photo.")
+			if errors.Is(err, database.NotFoundUser) {
+				return c.JSON(http.StatusBadRequest, fmt.Sprintf("No user found with username %s", username))
+			}
+			return c.JSON(http.StatusInternalServerError, "Error while finding user")
 		}
-		file, err := os.Open(profilePhotoFile.Name())
-		if err != nil {
-			logrus.Println("Can not open file", err)
-			return c.JSON(http.StatusInternalServerError, "Error while processing photo.")
-		}
-		bytes, err := ioutil.ReadAll(file)
-		if err != nil {
-			logrus.Println("Can not convert photo to bytes.")
-			return c.JSON(http.StatusInternalServerError, "Error while processing photo.")
-		}
-		base64ProfilePicture := base64.StdEncoding.EncodeToString(bytes)
-		user.ProfilePicture = base64ProfilePicture
-
-		return c.JSON(http.StatusOK, user)
-
+		return c.JSON(http.StatusOK, searchedUser)
 	}
+
 }
 func UpdateUserInformation(c echo.Context) error {
 	userID := c.Get("id").(string)
