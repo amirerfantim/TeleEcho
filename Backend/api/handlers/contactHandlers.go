@@ -3,9 +3,11 @@ package handlers
 import (
 	"TeleEcho/api/database"
 	"TeleEcho/model"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
@@ -45,7 +47,7 @@ func GetUserContacts(c echo.Context) error {
 		fmt.Printf("Error while parsing user id:%s\n", err)
 		return c.JSON(http.StatusBadRequest, "User id is wrong")
 	}
-	contacts, err := database.GetUserContacts(uint(userIDInt))
+	contacts, err := database.GetUserContactsInfo(uint(userIDInt))
 	if err != nil {
 		if errors.Is(err, database.NotFoundContact) {
 			return c.JSON(http.StatusOK, []model.Contact{})
@@ -95,17 +97,15 @@ func ChangeContentStatus(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, "Error while finding user")
 	}
-	newStatus := c.FormValue("status")
+	newStatusJSON := c.FormValue("status")
 	var status model.Status
-	if newStatus == "blocked" {
-		status.IsBlocked = true
+
+	err = json.Unmarshal([]byte(newStatusJSON), &status)
+	if err != nil {
+		logrus.Printf("Error parsing status JSON: %s", err)
+		return c.JSON(http.StatusBadRequest, "Can not parse data.")
 	}
-	if newStatus == "hide profile" {
-		status.ProfilePictureHide = true
-	}
-	if newStatus == "hide phone" {
-		status.PhoneNumberHide = true
-	}
+
 	err = database.UpdateContactStatus(uint(userIDInt), contact.ID, status)
 	if err != nil {
 		if errors.Is(err, database.NotFoundContact) {

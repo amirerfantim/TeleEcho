@@ -66,3 +66,43 @@ func UpdateContactStatus(userID uint, contactUserID uint, newStatus model.Status
 	logrus.Printf("Contact status updated successfully for UserID %d and ContactUserID %d", userID, contactUserID)
 	return nil
 }
+
+type UserWithContactStatus struct {
+	model.User
+	ProfilePictureHide bool `json:"profilePictureHide"`
+	PhoneNumberHide    bool `json:"phoneNumberHide"`
+	IsBlocked          bool `json:"isBlocked"`
+}
+
+func GetUserContactsInfo(userID uint) ([]model.User, error) {
+	var usersInfo []UserWithContactStatus
+	var contactUsers []model.User
+	err := DB.Table("contacts").
+		Select("users.id, users.username, users.firstname, users.lastname, users.phone, users.profile_picture, users.bio, contacts.profile_picture_hide, contacts.phone_number_hide, contacts.is_blocked").
+		Joins("left join users on users.id = contacts.contact_user_id").
+		Where("contacts.user_id = ?", userID).
+		Scan(&usersInfo).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, NotFoundContact
+		}
+		logrus.Printf("Error retrieving user contacts info: %s", err)
+		return nil, err
+	}
+	for _, userInfo := range usersInfo {
+		if userInfo.PhoneNumberHide {
+			userInfo.User.Phone = "hide"
+		}
+		if userInfo.ProfilePictureHide {
+			userInfo.User.ProfilePicture = "hide"
+		}
+		if userInfo.IsBlocked {
+			userInfo.User.Phone = "hide"
+			userInfo.User.Bio = "hide"
+			userInfo.User.ProfilePicture = "hide"
+		}
+		contactUsers = append(contactUsers, userInfo.User)
+	}
+
+	return contactUsers, nil
+}
