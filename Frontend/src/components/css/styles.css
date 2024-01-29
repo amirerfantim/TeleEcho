@@ -1,0 +1,384 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+/* General page styling */
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Form Card Styling */
+.card {
+    width: 400px;
+    padding: 2rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Form Styling */
+.form-control {
+    border: 2px solid #e7e7e7;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    animation: input-focus 2s ease infinite;
+}
+
+/* Button Styling */
+.btn {
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: none;
+    color: white;
+}
+
+.btn-primary {
+    background: #667eea; /* Primary button color */
+}
+
+.btn-primary:hover {
+    background: #5a67d8; /* Darken color on hover */
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: white;
+    color: #667eea;
+}
+
+/* Button container styling */
+.button-container {
+    display: flex;
+    justify-content: center; /* Center the buttons with space around them */
+    gap: 20px; /* Increased gap between buttons */
+}
+
+/* Input focus animation */
+@keyframes input-focus {
+    0% {
+        border-color: #667eea;
+    }
+    50% {
+        border-color: #764ba2;
+    }
+    100% {
+        border-color: #667eea;
+    }
+}
+
+/* Logo and title styles */
+.logo {
+    background: url('../../assets/messanger_logo.png') no-repeat center center;
+    background-size: contain;
+    height: 100px; /* Adjust as needed */
+    margin-bottom: 1rem;
+}
+
+.title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .card {
+        width: 90%;
+    }
+
+    .button-container {
+        flex-direction: column; /* Stack buttons vertically on smaller screens */
+        align-items: center; /* Center buttons vertically */
+    }
+
+    .btn {
+        width: 100%; /* Full width buttons on smaller screens */
+        margin-top: 10px; /* Add some margin to the top of each button */
+    }
+
+    .btn:first-child {
+        margin-top: 0; /* No top margin for the first button */
+    }
+}
+
+
+/* General page styling */
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Form Card Styling */
+.card {
+    width: 400px;
+    padding: 2rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Form Styling */
+.form-control {
+    border: 2px solid #e7e7e7;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    animation: input-focus 2s ease infinite;
+}
+
+/* Button Styling */
+.btn {
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: none;
+    color: white;
+}
+
+.btn-primary {
+    background: #667eea; /* Primary button color */
+}
+
+.btn-primary:hover {
+    background: #5a67d8; /* Darken color on hover */
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: white;
+    color: #667eea;
+}
+
+/* Button container styling */
+.button-container {
+    display: flex;
+    justify-content: center; /* Center the buttons with space around them */
+    gap: 20px; /* Increased gap between buttons */
+}
+
+/* Input focus animation */
+@keyframes input-focus {
+    0% {
+        border-color: #667eea;
+    }
+    50% {
+        border-color: #764ba2;
+    }
+    100% {
+        border-color: #667eea;
+    }
+}
+
+/* Logo and title styles */
+.logo {
+    background: url('../../assets/messanger_logo.png') no-repeat center center;
+    background-size: contain;
+    height: 100px; /* Adjust as needed */
+    margin-bottom: 1rem;
+}
+
+.title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .card {
+        width: 90%;
+    }
+
+    .button-container {
+        flex-direction: column; /* Stack buttons vertically on smaller screens */
+        align-items: center; /* Center buttons vertically */
+    }
+
+    .btn {
+        width: 100%; /* Full width buttons on smaller screens */
+        margin-top: 10px; /* Add some margin to the top of each button */
+    }
+
+    .btn:first-child {
+        margin-top: 0; /* No top margin for the first button */
+    }
+}
+
+/* General page styling */
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Profile Container */
+.profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Profile Picture */
+.profile-picture-container {
+    border-radius: 50%;
+    overflow: hidden;
+    line-height: 0; /* Removes bottom space under the image */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 5px solid white; /* Adds a white border for more definition */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.profile-picture {
+    width: 200px; /* Increased size */
+    height: 200px; /* Increased size */
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-picture-container:hover {
+    transform: scale(1.1); /* Enlarge the picture container on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Increased shadow for more depth on hover */
+}
+
+/* Cards styling */
+.name-card, .detail-card, .bio-card {
+    background-color: #f0f0f0;
+    border-radius: 20px; /* Rounded corners */
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease;
+}
+
+.name-card:hover, .detail-card:hover, .bio-card:hover {
+    transform: scale(1.05); /* Scale the cards up on hover */
+    border-radius: 30px; /* Rounder corners on hover */
+}
+
+/* Bio card styling for more depth */
+.bio-card {
+    width: 100%;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* More pronounced shadow for depth */
+}
+
+.bio-card:hover {
+    transform: scale(1.05); /* Scale the bio card up on hover */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3); /* Increased shadow for more depth on hover */
+}
+
+/* Details Container */
+.details-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.detail-card {
+    flex: 1;
+    min-width: 120px; /* Thinner cards for username and phone */
+    max-width: calc(50% - 10px); /* Adjusting for gap */
+}
+
+/* Text styling */
+.name-card p, .detail-card p, .bio-card p {
+    margin: 0;
+    font-size: 18px; /* Larger font size for better readability */
+    font-weight: 500; /* Slightly bolder font */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Text shadow for better legibility */
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .profile-container {
+        width: 90%;
+        padding: 10px;
+    }
+
+    .profile-picture {
+        width: 150px; /* Adjust size for small screens */
+        height: 150px; /* Adjust size for small screens */
+    }
+
+    .detail-card {
+        max-width: none;
+    }
+}
+
+/* Additional aesthetic enhancements */
+/* Adding a subtle gradient background to the cards for a more elegant look */
+.name-card, .detail-card, .bio-card {
+    background-image: linear-gradient(to right bottom, #ffffff, #f2f2f2);
+}
+
+/* Add more media query adjustments for smaller screens as necessary */
+
+
+/* Add more media query adjustments for smaller screens as necessary */

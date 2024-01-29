@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { isAuthenticated, getToken } from './AuthHelper';
-import './css/Profile.css';
+import React, {useState, useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {isAuthenticated, getToken} from './AuthHelper';
+import './css/styles.css';
 
 interface User {
     username: string;
@@ -16,6 +16,12 @@ const Profile: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const navigate = useNavigate();
+    const handleProfilePicHover = (isHover: boolean) => {
+        const profilePicElement = document.querySelector('.profile-picture');
+        if (profilePicElement) {
+            profilePicElement.classList.toggle('hover', isHover);
+        }
+    };
 
     useEffect(() => {
         if (!isAuthenticated()) {
@@ -47,7 +53,7 @@ const Profile: React.FC = () => {
                         handleServerError(data);
                     } else {
                         const text = await response.text();
-                        handleServerError({ error: text });
+                        handleServerError({error: text});
                     }
                 }
             } catch (error) {
@@ -70,7 +76,7 @@ const Profile: React.FC = () => {
     };
 
     if (errorMessage) {
-        return <div className="profile-container">
+        return <div className="profile-container error-container">
             <div className="alert alert-danger">
                 {errorMessage}
             </div>
@@ -78,24 +84,31 @@ const Profile: React.FC = () => {
     }
 
     if (!user) {
-        return <div className="profile-container">Loading...</div>;
+        return <div className="profile-container loading-container">Loading...</div>;
     }
 
     return (
         <div className="profile-container">
-            <h1>User Profile</h1>
-            <div className="user-info">
-                <p><strong>Username:</strong> {user.username}</p>
-                <p><strong>First Name:</strong> {user.firstname}</p>
-                <p><strong>Last Name:</strong> {user.lastname}</p>
-                <p><strong>Phone:</strong> {user.phone}</p>
-                <p><strong>Bio:</strong> {user.bio}</p>
-                {user.profilePicture && (
-                    <img src={user.profilePicture} alt="Profile" className="profile-picture" />
+            <div className="profile-picture-container">
+                {user?.profilePicture && (
+                    <img src={user.profilePicture} alt={`${user?.firstname} ${user?.lastname}`} className="profile-picture" />
                 )}
+            </div>
+            <div className="name-card">
+                <p>{user?.firstname} {user?.lastname}</p>
+            </div>
+            <div className="details-container">
+                <div className="detail-card username-card">
+                    <p>{user?.username}</p>
+                </div>
+                <div className="detail-card phone-card">
+                    <p>{user?.phone}</p>
+                </div>
+            </div>
+            <div className="bio-card">
+                <p>{user?.bio}</p>
             </div>
         </div>
     );
 };
-
 export default Profile;
