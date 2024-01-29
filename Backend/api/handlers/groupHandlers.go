@@ -48,7 +48,7 @@ func CreateGroup(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "Error while creating group")
 	} else {
-		return c.JSON(http.StatusOK, "Group created successfully.")
+		return c.JSON(http.StatusCreated, "Group created successfully.")
 	}
 }
 func GetUserGroups(c echo.Context) error {
@@ -106,5 +106,4 @@ func GetUserGroups(c echo.Context) error {
 		}
 		return c.JSON(http.StatusOK, groups)
 	}
-
 }
