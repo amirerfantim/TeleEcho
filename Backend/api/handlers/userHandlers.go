@@ -159,6 +159,23 @@ func GetUserInformation(c echo.Context) error {
 			}
 			return c.JSON(http.StatusInternalServerError, "Error while finding user")
 		}
+		profilePhotoFile, err := services.DownloadS3(services.StorageSession, configs.Config.StorageServiceBucket, searchedUser.ProfilePicture)
+		if err != nil {
+			logrus.Println("Can not download photo:", err)
+			return c.JSON(http.StatusInternalServerError, "Error while downloading photo.")
+		}
+		file, err := os.Open(profilePhotoFile.Name())
+		if err != nil {
+			logrus.Println("Can not open file", err)
+			return c.JSON(http.StatusInternalServerError, "Error while processing photo.")
+		}
+		bytes, err := ioutil.ReadAll(file)
+		if err != nil {
+			logrus.Println("Can not convert photo to bytes.")
+			return c.JSON(http.StatusInternalServerError, "Error while processing photo.")
+		}
+		base64ProfilePicture := base64.StdEncoding.EncodeToString(bytes)
+		searchedUser.ProfilePicture = base64ProfilePicture
 		return c.JSON(http.StatusOK, searchedUser)
 	}
 

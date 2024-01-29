@@ -14,6 +14,7 @@ var NotFoundUser = errors.New("user not found")
 var NotFoundContact = errors.New("contact not found")
 var UnauthorizedChatAccess = errors.New("unauthorized access to the chat")
 var IncorrectPassword = errors.New("incorrect password")
+var NotFoundGroup = errors.New("group not found")
 
 func ConnectDB() error {
 	var err error
