@@ -53,7 +53,7 @@ const RegisterForm = () => {
                 setSuccessMessage('User created successfully. Redirecting to login...');
                 setTimeout(() => navigate('/login'), 2000);
             } else {
-                setErrorMessage(data);
+                setErrorMessage(data || 'Registration failed');
             }
         } catch (error) {
             console.error(error);

@@ -33,9 +33,9 @@ const LoginForm: React.FC = () => {
 
             if (response.ok) {
                 localStorage.setItem('token', data.token as string);
-                navigate('/dashboard');
+                navigate('/profile');
             } else {
-                setErrorMessage(data.message || 'An error occurred');
+                setErrorMessage(data || 'Login failed');
             }
         } catch (error) {
             console.error('Login error:', error);
