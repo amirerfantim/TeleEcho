@@ -34,15 +34,21 @@ const Profile: React.FC = () => {
                     },
                 });
 
-                const data = await response.json();
                 if (response.ok) {
-                    // Check if the profile picture is in Base64 format
+                    const data = await response.json();
                     if (data.profilePicture && !data.profilePicture.startsWith('http')) {
                         data.profilePicture = `data:image/png;base64,${data.profilePicture}`;
                     }
                     setUser(data);
                 } else {
-                    handleServerError(data);
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const data = await response.json();
+                        handleServerError(data);
+                    } else {
+                        const text = await response.text();
+                        handleServerError({ error: text });
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching user info:', error);
@@ -54,7 +60,13 @@ const Profile: React.FC = () => {
     }, [navigate]);
 
     const handleServerError = (data: any) => {
-        setErrorMessage(data.error || data || 'Failed to retrieve user information.');
+        setErrorMessage('Invalid token. Redirecting to login...');
+
+        const timeoutId = setTimeout(() => {
+            navigate('/login');
+        }, 2000);
+
+        return () => clearTimeout(timeoutId);
     };
 
     if (errorMessage) {
