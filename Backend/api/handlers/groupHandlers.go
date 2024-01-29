@@ -38,7 +38,7 @@ func CreateGroup(c echo.Context) error {
 		logrus.Printf("Unable to open image\n")
 		return c.String(http.StatusBadRequest, "Unable to open file")
 	}
-	profilePath, err := services.UploadS3(services.StorageSession, profilePicture, configs.Config.StorageServiceBucket, userID+"/"+groupName)
+	profilePath, err := services.UploadS3(services.StorageSession, profilePicture, configs.Config.StorageServiceBucket, userID+""+groupName)
 	if err != nil {
 		logrus.Printf("Unable to upload image\n")
 		return c.String(http.StatusInternalServerError, "Unable to upload profile picture")
@@ -79,7 +79,7 @@ func GetUserGroups(c echo.Context) error {
 				}
 				file, err := os.Open(profilePhotoFile.Name())
 				if err != nil {
-					logrus.Println("Can not open file", err)
+					logrus.Println("Can not open image file", err)
 					return c.JSON(http.StatusInternalServerError, "Error while processing photo.")
 				}
 				bytes, err := ioutil.ReadAll(file)
