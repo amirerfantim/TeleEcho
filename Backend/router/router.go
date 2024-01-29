@@ -13,10 +13,12 @@ func New() *echo.Echo {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:5173"},
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE, echo.PATCH},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 	}))
+
 	e.POST("/register", handlers.RegisterUser)
 	e.POST("/login", handlers.Login)
+
 	userGroup := e.Group("/users", myMiddleware.ValidateJWT)
 	userGroup.DELETE("", handlers.DeleteUser)
 	userGroup.GET("", handlers.GetUserInformation)
