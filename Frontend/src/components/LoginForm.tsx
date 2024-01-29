@@ -1,11 +1,16 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './LoginForm.css'; // Make sure this CSS file is in the same directory
+import './css/LoginForm.css';
 
-const LoginForm = () => {
-    const [credentials, setCredentials] = useState({ username: '', password: '' });
-    const [errorMessage, setErrorMessage] = useState('');
+
+interface Credentials {
+    username: string;
+    password: string;
+}
+
+const LoginForm: React.FC = () => {
+    const [credentials, setCredentials] = useState<Credentials>({ username: '', password: '' });
+    const [errorMessage, setErrorMessage] = useState<string>('');
     const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,11 +32,10 @@ const LoginForm = () => {
             const data = await response.json();
 
             if (response.ok) {
-                // Store the received token and redirect the user
-                localStorage.setItem('token', data.token);
-                navigate('/dashboard'); // Redirect to the dashboard or home page
+                localStorage.setItem('token', data.token as string);
+                navigate('/dashboard');
             } else {
-                setErrorMessage(data);
+                setErrorMessage(data.message || 'An error occurred');
             }
         } catch (error) {
             console.error('Login error:', error);
