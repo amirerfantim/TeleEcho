@@ -1,25 +1,130 @@
+/* General page styling */
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Profile Container */
 .profile-container {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
 }
 
-.user-info {
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
-    padding: 20px;
-    margin-top: 20px;
-}
-
-.user-info p {
-    font-size: 16px;
-    line-height: 1.5;
+/* Profile Picture */
+.profile-picture-container {
+    border-radius: 50%;
+    overflow: hidden;
+    line-height: 0; /* Removes bottom space under the image */
+    transition: transform 0.3s ease;
 }
 
 .profile-picture {
-    max-width: 100px;
-    height: auto;
+    width: 200px; /* Increased size */
+    height: 200px; /* Increased size */
+    object-fit: cover;
     border-radius: 50%;
-    margin-top: 20px;
+}
+
+.profile-picture-container:hover {
+    transform: scale(1.1); /* Enlarge the picture container on hover */
+}
+
+/* Cards styling */
+.name-card, .detail-card, .bio-card {
+    background-color: #f0f0f0;
+    border-radius: 20px; /* Rounded corners */
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease, border-radius 0.3s ease;
+}
+
+.name-card:hover, .detail-card:hover, .bio-card:hover {
+    transform: scale(1.05); /* Scale the cards up on hover */
+}
+
+/* Bio card styling for a more compact look */
+.bio-card {
+    width: 90%; /* Reduced width for a more compact look */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+}
+
+.bio-card:hover {
+    transform: scale(1.05); /* Scale the bio card up on hover */
+}
+
+/* Details Container */
+.details-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.detail-card {
+    flex: 1;
+    min-width: 120px; /* Thinner cards for username and phone */
+    max-width: calc(50% - 10px); /* Adjusting for gap */
+}
+
+/* Text styling */
+.name-card p, .detail-card p, .bio-card p {
+    margin: 0;
+    font-size: 18px; /* Larger font size for better readability */
+    font-weight: 500; /* Slightly bolder font */
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .profile-container {
+        width: 90%;
+        padding: 10px;
+    }
+
+    .profile-picture {
+        width: 150px; /* Adjust size for small screens */
+        height: 150px; /* Adjust size for small screens */
+    }
+
+    .bio-card {
+        width: 100%; /* Full width on smaller screens for better readability */
+    }
+
+    .detail-card {
+        max-width: none;
+    }
+}
+
+/* Additional aesthetic enhancements */
+/* Adding a subtle gradient background to the cards for a more elegant look */
+.name-card, .detail-card, .bio-card {
+    background-image: linear-gradient(to right bottom, #ffffff, #f2f2f2);
+}
+
+/* Add styles for edit mode */
+.detail-card input {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    width: calc(100% - 10px);
+}
+
+.detail-card div {
+    margin-top: 10px;
+}
+
+.detail-card button {
+    margin-right: 5px;
 }

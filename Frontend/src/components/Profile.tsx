@@ -23,6 +23,115 @@ const Profile: React.FC = () => {
             profilePicElement.classList.toggle('hover', isHover);
         }
     };
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingField, setEditingField] = useState<string | null>(null);
+    const EditButton = () => (
+        <button className="btn btn-secondary" onClick={() => setIsEditing(!isEditing)}>
+            {/* Icon for edit, can be replaced with an actual icon */}
+            {isEditing ? "Cancel" : "Edit"}
+        </button>
+    );
+
+    interface CardContentProps {
+        field: string;
+        initialValue: string;
+    }
+
+    interface CardContentProps {
+        field: string;
+        initialValue: string;
+        saveChanges: (updatedUserInfo: { [key: string]: string }) => Promise<void>;
+        setEditingField: React.Dispatch<React.SetStateAction<string | null>>;
+        isEditing: boolean;
+    }
+
+    const handleEditClick = () => {
+        setIsEditing(!isEditing);
+        if (isEditing) {
+            setEditingField(null);
+        }
+    };
+
+    const CardContent: React.FC<CardContentProps> = ({ field, initialValue, saveChanges, setEditingField, isEditing }) => {
+        const [value, setValue] = useState(initialValue);
+        const [isFieldEditing, setIsFieldEditing] = useState(false);
+
+        const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            setValue(e.target.value);
+        };
+
+        const handleSave = async () => {
+            await saveChanges({ [field]: value });
+            setEditingField(null);
+        };
+
+
+
+
+        const handleEditClick = () => {
+            setIsFieldEditing(true);
+            setEditingField(field);
+        };
+
+        const handleCancel = () => {
+            setIsFieldEditing(false);
+            setEditingField(null);
+            setValue(initialValue); // Reset value to initial
+        };
+
+        return (
+            <div className={`detail-card ${field}-card`}>
+                {isFieldEditing ? (
+                    <>
+                        <input type="text" value={value} onChange={handleInputChange} />
+                        <div>
+                            <button onClick={handleSave}>Save</button>
+                            <button onClick={handleCancel}>Cancel</button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <p>{value}</p>
+                        {isEditing && <button onClick={handleEditClick}>Edit</button>}
+                    </>
+                )}
+            </div>
+        );
+    };
+
+
+    const saveChanges = async (updatedUserInfo: { [key: string]: string }) => {
+        try {
+            const formData = new FormData();
+
+            for (const key in updatedUserInfo) {
+                formData.append(key, updatedUserInfo[key]);
+            }
+
+            const token = getToken();
+            const response = await fetch('http://127.0.0.1:8020/users', {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': ` ${token}`,
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                console.log("User information updated successfully");
+                // Handle successful response
+            } else {
+                // Handle errors
+                const errorData = await response.json();
+                console.error("Error updating user information:", errorData);
+            }
+        } catch (error) {
+            console.error("Error in API request:", error);
+        }
+    };
+
+
+
 
     useEffect(() => {
         if (!isAuthenticated()) {
@@ -91,24 +200,35 @@ const Profile: React.FC = () => {
 
     return (
         <div className="profile-container">
+            <button className="btn btn-secondary" onClick={handleEditClick}>
+                {isEditing ? "Cancel" : "Edit"}
+            </button>
             <div className="profile-picture-container">
-                {user?.profilePicture && (
-                    <img src={user.profilePicture} alt={`${user?.firstname} ${user?.lastname}`} className="profile-picture" />
+                {user.profilePicture && (
+                    <img src={user.profilePicture} alt={`${user.firstname} ${user.lastname}`} className="profile-picture" />
                 )}
             </div>
             <div className="name-card">
-                <p>{user?.firstname} {user?.lastname}</p>
+                <p>{user.firstname} {user.lastname}</p>
             </div>
             <div className="details-container">
-                <div className="detail-card username-card">
-                    <p>{user?.username}</p>
-                </div>
-                <div className="detail-card phone-card">
-                    <p>{user?.phone}</p>
-                </div>
+                <CardContent
+                    field="username"
+                    initialValue={user.username}
+                    saveChanges={saveChanges}
+                    setEditingField={setEditingField}
+                    isEditing={isEditing}
+                />
+                <CardContent
+                    field="phone"
+                    initialValue={user.phone}
+                    saveChanges={saveChanges}
+                    setEditingField={setEditingField}
+                    isEditing={isEditing}
+                />
             </div>
             <div className="bio-card">
-                <p>{user?.Bio}</p>
+                <p>{user.Bio}</p>
             </div>
         </div>
     );
