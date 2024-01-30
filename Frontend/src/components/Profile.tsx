@@ -17,20 +17,9 @@ const Profile: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const navigate = useNavigate();
-    const handleProfilePicHover = (isHover: boolean) => {
-        const profilePicElement = document.querySelector('.profile-picture');
-        if (profilePicElement) {
-            profilePicElement.classList.toggle('hover', isHover);
-        }
-    };
+
     const [isEditing, setIsEditing] = useState(false);
     const [editingField, setEditingField] = useState<string | null>(null);
-    const EditButton = () => (
-        <button className="btn btn-secondary" onClick={() => setIsEditing(!isEditing)}>
-            {/* Icon for edit, can be replaced with an actual icon */}
-            {isEditing ? "Cancel" : "Edit"}
-        </button>
-    );
 
     interface CardContentProps {
         field: string;
@@ -218,30 +207,24 @@ const Profile: React.FC = () => {
 
     return (
         <div className="profile-container">
+            <div className="profile-picture-edit-container">
+                {user.profilePicture && (
+                    <img src={user.profilePicture} alt={`${user.firstname} ${user.lastname}`} className="profile-picture" />
+                )}
+                {isEditing && (
+                    <>
+                        <input type="file" id="profile-picture-input" style={{ display: 'none' }} onChange={handleProfilePictureChange} />
+                        <label htmlFor="profile-picture-input" className="btn btn-secondary">
+                            Change Profile Picture
+                        </label>
+                    </>
+                )}
+            </div>
             <button className="btn btn-secondary" onClick={handleEditClick}>
                 {isEditing ? "Cancel" : "Edit"}
             </button>
-            <div className="profile-picture-container">
-                {user.profilePicture && (
-                    <img src={user.profilePicture} alt={`${user.firstname} ${user.lastname}`}
-                         className="profile-picture"/>
-                )}
-                {isEditing && (
-                    <div>
-                        <input type="file" id="profile-picture-input" style={{display: 'none'}}
-                               onChange={handleProfilePictureChange}/>
-                        <button onClick={() => {
-                            const inputElement = document.getElementById('profile-picture-input');
-                            if (inputElement) {
-                                inputElement.click();
-                            }
-                        }}>Change Profile Picture
-                        </button>
 
-                    </div>
-                )}
-            </div>
-
+            {/* Content Fields */}
             <CardContent
                 field="firstname"
                 initialValue={user.firstname}
@@ -283,5 +266,7 @@ const Profile: React.FC = () => {
             </div>
         </div>
     );
+
+
 };
 export default Profile;

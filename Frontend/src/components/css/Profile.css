@@ -27,7 +27,9 @@ body, html {
     overflow: hidden;
     line-height: 0; /* Removes bottom space under the image */
     transition: transform 0.3s ease;
+    flex-shrink: 0; /* Prevents the image from shrinking */
 }
+
 
 .profile-picture {
     width: 200px; /* Increased size */
@@ -127,4 +129,16 @@ body, html {
 
 .detail-card button {
     margin-right: 5px;
+}
+
+.profile-picture-edit-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust the space between the picture and the button */
+}
+
+.edit-button {
+    padding: 5px 10px; /* Add padding for better appearance */
+    cursor: pointer; /* Changes cursor to indicate button */
+    /* Additional styles to match your design */
 }
