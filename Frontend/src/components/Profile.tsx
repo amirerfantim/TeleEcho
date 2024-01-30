@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {isAuthenticated, getToken} from './AuthHelper';
+import {isAuthenticated, getToken, removeToken} from './AuthHelper';
 import './css/Profile.css';
 import LoadingSpinner from "./LoadingSpinner";
 
@@ -124,6 +124,33 @@ const Profile: React.FC = () => {
     };
 
 
+    const deleteUser = async () => {
+        if(window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+            try {
+                const token = getToken();
+                const response = await fetch('http://127.0.0.1:8020/users', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    console.log("User deleted successfully");
+                    removeToken()
+                    navigate('/login');
+                } else {
+                    // Handle errors
+                    const errorData = await response.json();
+                    console.error("Error deleting user:", errorData);
+                }
+            } catch (error) {
+                console.error("Error in API request:", error);
+            }
+        }
+    };
+
+
 
 
 
@@ -206,23 +233,31 @@ const Profile: React.FC = () => {
 
 
     return (
+
         <div className="profile-container">
             <div className="profile-picture-edit-container">
                 {user.profilePicture && (
-                    <img src={user.profilePicture} alt={`${user.firstname} ${user.lastname}`} className="profile-picture" />
+                    <img src={user.profilePicture} alt={`${user.firstname} ${user.lastname}`}
+                         className="profile-picture"/>
                 )}
                 {isEditing && (
                     <>
-                        <input type="file" id="profile-picture-input" style={{ display: 'none' }} onChange={handleProfilePictureChange} />
+                        <input type="file" id="profile-picture-input" style={{display: 'none'}}
+                               onChange={handleProfilePictureChange}/>
                         <label htmlFor="profile-picture-input" className="btn btn-secondary">
                             Change Profile Picture
                         </label>
                     </>
                 )}
             </div>
-            <button className="btn btn-secondary" onClick={handleEditClick}>
-                {isEditing ? "Cancel" : "Edit"}
-            </button>
+            <div className="buttons-container">
+                <button className="btn btn-secondary edit-button" onClick={handleEditClick}>
+                    {isEditing ? "Cancel" : "Edit Profile"}
+                </button>
+                <button className="btn btn-danger delete-button" onClick={deleteUser}>
+                    Delete Account
+                </button>
+            </div>
 
             {/* Content Fields */}
             <CardContent

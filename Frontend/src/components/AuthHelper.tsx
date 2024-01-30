@@ -5,3 +5,7 @@ export const isAuthenticated = (): boolean => {
 export const getToken = (): string | null => {
     return localStorage.getItem('token');
 };
+
+export const removeToken = () => {
+    localStorage.removeItem('token');
+};
