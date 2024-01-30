@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {isAuthenticated, getToken} from './AuthHelper';
-import './css/styles.css';
+import './css/Profile.css';
+import LoadingSpinner from "./LoadingSpinner";
 
 interface User {
     username: string;
@@ -84,8 +85,9 @@ const Profile: React.FC = () => {
     }
 
     if (!user) {
-        return <div className="profile-container loading-container">Loading...</div>;
+        return <LoadingSpinner />;
     }
+
 
     return (
         <div className="profile-container">
