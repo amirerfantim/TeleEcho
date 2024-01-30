@@ -100,19 +100,23 @@ const Profile: React.FC = () => {
     };
 
 
-    const saveChanges = async (updatedUserInfo: { [key: string]: string }) => {
+    const saveChanges = async (updatedUserInfo: any, isProfilePic = false) => {
         try {
-            const formData = new FormData();
+            let formData = new FormData();
 
-            for (const key in updatedUserInfo) {
-                formData.append(key, updatedUserInfo[key]);
+            if (isProfilePic) {
+                formData = updatedUserInfo as FormData;
+            } else {
+                for (const key in updatedUserInfo) {
+                    formData.append(key, updatedUserInfo[key]);
+                }
             }
 
             const token = getToken();
             const response = await fetch('http://127.0.0.1:8020/users', {
                 method: 'PATCH',
                 headers: {
-                    'Authorization': ` ${token}`,
+                    'Authorization': `${token}`,
                 },
                 body: formData
             });
@@ -129,6 +133,7 @@ const Profile: React.FC = () => {
             console.error("Error in API request:", error);
         }
     };
+
 
 
 
@@ -185,6 +190,19 @@ const Profile: React.FC = () => {
         return () => clearTimeout(timeoutId);
     };
 
+    const handleProfilePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0];
+
+            const formData = new FormData();
+            formData.append('profile', file);
+
+            saveChanges(formData, true);
+        }
+    };
+
+
+
     if (errorMessage) {
         return <div className="profile-container error-container">
             <div className="alert alert-danger">
@@ -205,12 +223,39 @@ const Profile: React.FC = () => {
             </button>
             <div className="profile-picture-container">
                 {user.profilePicture && (
-                    <img src={user.profilePicture} alt={`${user.firstname} ${user.lastname}`} className="profile-picture" />
+                    <img src={user.profilePicture} alt={`${user.firstname} ${user.lastname}`}
+                         className="profile-picture"/>
+                )}
+                {isEditing && (
+                    <div>
+                        <input type="file" id="profile-picture-input" style={{display: 'none'}}
+                               onChange={handleProfilePictureChange}/>
+                        <button onClick={() => {
+                            const inputElement = document.getElementById('profile-picture-input');
+                            if (inputElement) {
+                                inputElement.click();
+                            }
+                        }}>Change Profile Picture
+                        </button>
+
+                    </div>
                 )}
             </div>
-            <div className="name-card">
-                <p>{user.firstname} {user.lastname}</p>
-            </div>
+
+            <CardContent
+                field="firstname"
+                initialValue={user.firstname}
+                saveChanges={saveChanges}
+                setEditingField={setEditingField}
+                isEditing={isEditing}
+            />
+            <CardContent
+                field="lastname"
+                initialValue={user.lastname}
+                saveChanges={saveChanges}
+                setEditingField={setEditingField}
+                isEditing={isEditing}
+            />
             <div className="details-container">
                 <CardContent
                     field="username"
@@ -228,7 +273,13 @@ const Profile: React.FC = () => {
                 />
             </div>
             <div className="bio-card">
-                <p>{user.Bio}</p>
+                <CardContent
+                    field="bio"
+                    initialValue={user.Bio}
+                    saveChanges={saveChanges}
+                    setEditingField={setEditingField}
+                    isEditing={isEditing}
+                />
             </div>
         </div>
     );
