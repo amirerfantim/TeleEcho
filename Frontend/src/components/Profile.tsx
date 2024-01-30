@@ -8,7 +8,7 @@ interface User {
     firstname: string;
     lastname: string;
     phone: string;
-    bio: string;
+    Bio: string;
     profilePicture?: string;
 }
 
@@ -106,7 +106,7 @@ const Profile: React.FC = () => {
                 </div>
             </div>
             <div className="bio-card">
-                <p>{user?.bio}</p>
+                <p>{user?.Bio}</p>
             </div>
         </div>
     );

@@ -261,6 +261,7 @@ body, html {
     }
 }
 
+
 /* General page styling */
 body, html {
     height: 100%;
@@ -289,9 +290,7 @@ body, html {
     border-radius: 50%;
     overflow: hidden;
     line-height: 0; /* Removes bottom space under the image */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 5px solid white; /* Adds a white border for more definition */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: transform 0.3s ease;
 }
 
 .profile-picture {
@@ -303,7 +302,6 @@ body, html {
 
 .profile-picture-container:hover {
     transform: scale(1.1); /* Enlarge the picture container on hover */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Increased shadow for more depth on hover */
 }
 
 /* Cards styling */
@@ -314,23 +312,21 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: transform 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, border-radius 0.3s ease;
 }
 
 .name-card:hover, .detail-card:hover, .bio-card:hover {
     transform: scale(1.05); /* Scale the cards up on hover */
-    border-radius: 30px; /* Rounder corners on hover */
 }
 
-/* Bio card styling for more depth */
+/* Bio card styling for a more compact look */
 .bio-card {
-    width: 100%;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* More pronounced shadow for depth */
+    width: 90%; /* Reduced width for a more compact look */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
 }
 
 .bio-card:hover {
     transform: scale(1.05); /* Scale the bio card up on hover */
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3); /* Increased shadow for more depth on hover */
 }
 
 /* Details Container */
@@ -352,7 +348,6 @@ body, html {
     margin: 0;
     font-size: 18px; /* Larger font size for better readability */
     font-weight: 500; /* Slightly bolder font */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Text shadow for better legibility */
 }
 
 /* Responsive adjustments */
@@ -367,6 +362,10 @@ body, html {
         height: 150px; /* Adjust size for small screens */
     }
 
+    .bio-card {
+        width: 100%; /* Full width on smaller screens for better readability */
+    }
+
     .detail-card {
         max-width: none;
     }
@@ -378,7 +377,3 @@ body, html {
     background-image: linear-gradient(to right bottom, #ffffff, #f2f2f2);
 }
 
-/* Add more media query adjustments for smaller screens as necessary */
-
-
-/* Add more media query adjustments for smaller screens as necessary */
