@@ -237,13 +237,15 @@ func UpdateUserInformation(c echo.Context) error {
 			user.Password = hashPassword
 		}
 	}
-
+	logrus.Infof(username)
 	profilePicture, err := c.FormFile("profile")
+	println(profilePicture)
 	if err != nil {
-		logrus.Printf("Unable to open image\n")
-		return c.JSON(http.StatusBadRequest, "Unable to open file")
-	}
-	if profilePicture != nil {
+		if err != http.ErrMissingFile {
+			logrus.Printf("Error opening file: %v\n", err)
+			return c.JSON(http.StatusBadRequest, "Unable to open file")
+		}
+	} else {
 		profilePath, err := services.UploadS3(services.StorageSession, profilePicture, configs.Config.StorageServiceBucket, username)
 		if err != nil {
 			logrus.Printf("Unable to upload image\n")
@@ -251,6 +253,7 @@ func UpdateUserInformation(c echo.Context) error {
 		}
 		user.ProfilePicture = profilePath
 	}
+
 	bio := c.FormValue("bio")
 	if bio != "" {
 		user.Bio = bio
