@@ -91,7 +91,7 @@ const ContactsPage = () => {
                 if (Array.isArray(data)) {
                     setContacts(data);
                 } else {
-                    setError('Data format is incorrect');
+                    setError('the contact list is empty');
                 }
             })
             .catch(error => setError(error.message));
