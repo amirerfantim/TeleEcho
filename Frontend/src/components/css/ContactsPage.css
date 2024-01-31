@@ -1,0 +1,18 @@
+/* ContactsPage.css */
+.contacts-container {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.contacts-container ul {
+    list-style: none;
+    padding: 0;
+}
+
+.contacts-container li {
+    margin-bottom: 10px;
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
