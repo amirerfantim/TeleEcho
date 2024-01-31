@@ -3,6 +3,9 @@ import {useNavigate} from 'react-router-dom';
 import {isAuthenticated, getToken, removeToken} from './AuthHelper';
 import './css/Profile.css';
 import LoadingSpinner from "./LoadingSpinner";
+import groupIcon from "../assets/group.png";
+import contactIcon from "../assets/contact.png";
+
 
 interface User {
     username: string;
@@ -236,6 +239,12 @@ const Profile: React.FC = () => {
     return (
 
         <div className="profile-container">
+            <button className="navigate-first" onClick={() => navigate('/group')}>
+                <img src={groupIcon} alt="Profile"/>
+            </button>
+            <button className="navigate-second" onClick={() => navigate('/contacts')}>
+                <img src={contactIcon} alt="Contacts"/>
+            </button>
             <div className="profile-picture-edit-container">
                 {user.profilePicture && (
                     <img src={user.profilePicture} alt={`${user.firstname} ${user.lastname}`}

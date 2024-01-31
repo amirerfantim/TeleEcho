@@ -3,6 +3,7 @@ import './css/ContactsPage.css';
 import { useNavigate } from 'react-router-dom'; // Import useHistory from react-router-dom
 import deleteIcon from '../assets/delete_icon.png';
 import profileIcon from '../assets/profile.png'; // Import your profile icon
+import groupIcon from '../assets/group.png'; // Import your profile icon
 
 
 
@@ -66,6 +67,11 @@ const ContactsPage = () => {
     const navigateToProfile = () => {
         navigate('/profile');
     };
+
+    const navigateToGroups = () => {
+        navigate('/group');
+    };
+
 
     const fetchContacts = () => {
         fetch('http://127.0.0.1:8020/contacts', {
@@ -174,9 +180,13 @@ const ContactsPage = () => {
             {successMessage && <div className="success-message">{successMessage}</div>}
 
             {error && <div className="error-message">{error}</div>}
-            <button className="navigate-profile" onClick={navigateToProfile}>
+            <button className="navigate-first" onClick={navigateToProfile}>
                 <img src={profileIcon} alt="Profile"/>
             </button>
+            <button className="navigate-second" onClick={navigateToGroups}>
+                <img src={groupIcon} alt="Groups"/>
+            </button>
+
 
             <div className="add-contact-container">
                 <button className="add-contact" onClick={() => setShowAddContactForm(!showAddContactForm)}>+</button>
