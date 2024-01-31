@@ -30,7 +30,7 @@ func New() *echo.Echo {
 	contactGroup.DELETE("", handlers.DeleteContact)
 	contactGroup.PATCH("", handlers.ChangeContentStatus)
 
-	groupHandlersGroup := e.Group("/Group", myMiddleware.ValidateJWT)
+	groupHandlersGroup := e.Group("/group", myMiddleware.ValidateJWT)
 	groupHandlersGroup.POST("", handlers.CreateGroup)
 	groupHandlersGroup.GET("", handlers.GetUserGroups)
 
