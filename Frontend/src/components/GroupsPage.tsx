@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './css/GroupsPage.css'; // Your CSS file path
+import './css/GroupsPage.css';
+import profileIcon from "../assets/profile.png"; // Your CSS file path
 
 interface Group {
     id: number;
@@ -94,15 +95,14 @@ const GroupsPage: React.FC = () => {
 
     return (
         <div className="groups-page">
-            <button className="navigate-group" onClick={() => navigate('/contacts')}>
-                {/* You can use an icon or text */}
-                Go to Contacts
+            <button className="navigate-profile" onClick={() => navigate('/profile')}>
+                <img src={profileIcon} alt="Profile"/>
             </button>
-            <button className="add-group" onClick={() => setShowAddGroupModal(true)}>+</button>
+            <button className="add-contact" onClick={() => setShowAddGroupModal(true)}>+</button>
             <div className="groups-container">
                 {groups.map(group => (
                     <div key={group.id} className="group-card" onClick={() => navigateToGroup(group.id)}>
-                        <img src={group.profilePicture} alt={group.name} />
+                        {/* Removed img tag to not display the profile picture */}
                         <h3>{group.name}</h3>
                         <p>{group.description}</p>
                     </div>
@@ -147,6 +147,7 @@ const GroupsPage: React.FC = () => {
             )}
         </div>
     );
+
 
 };
 

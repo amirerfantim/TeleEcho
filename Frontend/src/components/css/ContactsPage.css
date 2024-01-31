@@ -147,9 +147,9 @@ input[type="text"] {
     border-radius: 50%; /* Circular shape */
     width: 40px; /* Same width as the profile button */
     height: 40px; /* Same height as the profile button */
-    position: absolute;
-    left: 20px; /* Adjust to align below the profile button */
-    top: 80px; /* Adjust if necessary to position below the profile button */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
     font-size: 24px; /* Adjust the size of the "+" */
     display: flex;
     align-items: center;
