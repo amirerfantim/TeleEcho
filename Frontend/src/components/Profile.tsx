@@ -57,6 +57,7 @@ const Profile: React.FC = () => {
 
 
 
+
         const handleEditClick = () => {
             setIsFieldEditing(true);
             setEditingField(field);
@@ -254,7 +255,7 @@ const Profile: React.FC = () => {
                 <button className="btn btn-secondary edit-button" onClick={handleEditClick}>
                     {isEditing ? "Cancel" : "Edit Profile"}
                 </button>
-                <button className="btn btn-danger delete-button" onClick={deleteUser}>
+                <button className="btn btn-danger button-container" onClick={deleteUser}>
                     Delete Account
                 </button>
             </div>

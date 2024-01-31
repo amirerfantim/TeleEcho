@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './css/ContactsPage.css';
-import deleteIcon from '../assets/delete_icon.png'; // Import your PNG icon here
+import { useNavigate } from 'react-router-dom'; // Import useHistory from react-router-dom
+import deleteIcon from '../assets/delete_icon.png';
+import profileIcon from '../assets/profile.png'; // Import your profile icon
+
 
 
 interface Contact {
@@ -17,6 +20,11 @@ const ContactsPage = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [showAddContactForm, setShowAddContactForm] = useState(false);
     const [newContactPhone, setNewContactPhone] = useState('');
+    const navigate = useNavigate(); // useNavigate hook for navigation
+
+    const navigateToProfile = () => {
+        navigate('/profile');
+    };
 
     useEffect(() => {
         fetch('http://127.0.0.1:8020/contacts', {
@@ -116,37 +124,40 @@ const ContactsPage = () => {
     };
 
     return (
-        <div className="contacts-container">
-            {successMessage && <p className="success-message">{successMessage}</p>}
-            {error && <p className="error-message">{error}</p>}
-            <button onClick={toggleAddContactForm}>Add Contact</button>
-            {showAddContactForm && (
-                <form onSubmit={handleAddContact}>
-                    <input
-                        type="text"
-                        value={newContactPhone}
-                        onChange={handleNewContactPhoneChange}
-                        placeholder="Enter phone number"
-                    />
-                    <button type="submit">Create Contact</button>
-                </form>
-            )}
-            <ul>
+        <div className="contacts-page">
+            <button className="navigate-profile" onClick={navigateToProfile}>
+                <img src={profileIcon} alt="Profile"/>
+            </button>
+            <div className="add-contact-container">
+                <button className="add-contact" onClick={() => setShowAddContactForm(!showAddContactForm)}>+</button>
+                {showAddContactForm && (
+                    <form onSubmit={(e) => e.preventDefault()}>
+                        <input
+                            type="text"
+                            value={newContactPhone}
+                            onChange={(e) => setNewContactPhone(e.target.value)}
+                            placeholder="Enter phone number"
+                        />
+                        <button type="submit" className="create-contact">Create Contact</button>
+                    </form>
+                )}
+            </div>
+            <ul className="chat-list">
                 {contacts.map(contact => (
                     <li key={contact.id} className="contact-card">
                         <div className="contact-info">
-                            <div>{contact.firstname} {contact.lastname}</div>
-                            <div>@{contact.username}</div>
-                            <div>{contact.phone}</div>
+                            <div className="name">{contact.firstname} {contact.lastname}</div>
+                            <div className="details">@{contact.username} | {contact.phone}</div>
                         </div>
                         <button onClick={() => deleteContact(contact.username)} className="delete-button">
-                            <img src={deleteIcon} alt="Delete"/> {/* Use the imported icon */}
+                            <img src={deleteIcon} alt="Delete"/>
                         </button>
                     </li>
                 ))}
             </ul>
         </div>
     );
+
 };
 
 export default ContactsPage;

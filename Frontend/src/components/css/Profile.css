@@ -142,11 +142,3 @@ body, html {
     cursor: pointer; /* Changes cursor to indicate button */
     /* Additional styles to match your design */
 }
-
-.buttons-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px; /* Adjust the space between buttons */
-    margin-top: 20px; /* Add some space above the button group */
-}
