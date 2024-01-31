@@ -14,6 +14,47 @@ interface Contact {
     phone: string;
 }
 
+interface ModalProps {
+    show: boolean;
+    onClose: () => void;
+    onAddContact: (e: React.FormEvent<HTMLFormElement>) => void;
+    newContactPhone: string;
+    handleNewContactPhoneChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const Modal: React.FC<ModalProps> = ({ show, onClose, onAddContact, newContactPhone, handleNewContactPhoneChange }) => {
+    if (!show) {
+        return null;
+    }
+
+    return (
+        <div className="modal" onClick={onClose}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h4 className="modal-title">Add New Contact</h4>
+                </div>
+                <div className="modal-body">
+                    <form onSubmit={onAddContact}>
+                        <input
+                            type="text"
+                            value={newContactPhone}
+                            onChange={handleNewContactPhoneChange}
+                            placeholder="Enter phone number"
+                        />
+                        <button type="submit" className="create-contact">Create Contact</button>
+                    </form>
+                </div>
+                <div className="modal-footer">
+                    <button onClick={onClose} className="button">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
 const ContactsPage = () => {
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [error, setError] = useState('');
@@ -51,30 +92,6 @@ const ContactsPage = () => {
     };
 
 
-    // useEffect(() => {
-    //     fetch('http://127.0.0.1:8020/contacts', {
-    //         method: 'GET',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': '' + localStorage.getItem('token'),
-    //         },
-    //     })
-    //         .then(response => {
-    //             if (response.ok) {
-    //                 return response.json();
-    //             }
-    //             throw new Error('Network response was not ok.');
-    //         })
-    //         .then(data => {
-    //             if (Array.isArray(data)) {
-    //                 setContacts(data);
-    //             } else {
-    //                 setError('Data format is incorrect');
-    //             }
-    //         })
-    //         .catch(error => setError(error.message));
-    // }, []);
-
     useEffect(() => {
         fetchContacts();
     }, []);
@@ -102,17 +119,15 @@ const ContactsPage = () => {
             body: `phone=${encodeURIComponent(newContactPhone)}`
         })
             .then(response => {
-                // Parse the JSON response body
                 return response.json().then(data => {
+                    setShowAddContactForm(false);
                     if (response.ok) {
                         // Handle success
                         setSuccessMessage('Contact added successfully');
-                        setShowAddContactForm(false);
                         setNewContactPhone('');
                         fetchContacts(); // Refresh the contact list
 
                     } else {
-                        // Handle errors, check if the response has an "error" key
                         if (data && data.error) {
                             throw new Error(data.error);
                         } else {
@@ -158,24 +173,20 @@ const ContactsPage = () => {
         <div className="contacts-page">
             {successMessage && <div className="success-message">{successMessage}</div>}
 
-            {/* Display Error Message */}
             {error && <div className="error-message">{error}</div>}
             <button className="navigate-profile" onClick={navigateToProfile}>
                 <img src={profileIcon} alt="Profile"/>
             </button>
+
             <div className="add-contact-container">
                 <button className="add-contact" onClick={() => setShowAddContactForm(!showAddContactForm)}>+</button>
-                {showAddContactForm && (
-                    <form onSubmit={handleAddContact}>
-                        <input
-                            type="text"
-                            value={newContactPhone}
-                            onChange={handleNewContactPhoneChange}
-                            placeholder="Enter phone number"
-                        />
-                        <button type="submit" className="create-contact">Create Contact</button>
-                    </form>
-                )}
+                <Modal
+                    show={showAddContactForm}
+                    onClose={() => setShowAddContactForm(false)}
+                    onAddContact={handleAddContact}
+                    newContactPhone={newContactPhone}
+                    handleNewContactPhoneChange={handleNewContactPhoneChange}
+                />
 
             </div>
             <ul className="chat-list">
