@@ -26,7 +26,7 @@ const ContactsPage = () => {
         navigate('/profile');
     };
 
-    useEffect(() => {
+    const fetchContacts = () => {
         fetch('http://127.0.0.1:8020/contacts', {
             method: 'GET',
             headers: {
@@ -48,6 +48,35 @@ const ContactsPage = () => {
                 }
             })
             .catch(error => setError(error.message));
+    };
+
+
+    // useEffect(() => {
+    //     fetch('http://127.0.0.1:8020/contacts', {
+    //         method: 'GET',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': '' + localStorage.getItem('token'),
+    //         },
+    //     })
+    //         .then(response => {
+    //             if (response.ok) {
+    //                 return response.json();
+    //             }
+    //             throw new Error('Network response was not ok.');
+    //         })
+    //         .then(data => {
+    //             if (Array.isArray(data)) {
+    //                 setContacts(data);
+    //             } else {
+    //                 setError('Data format is incorrect');
+    //             }
+    //         })
+    //         .catch(error => setError(error.message));
+    // }, []);
+
+    useEffect(() => {
+        fetchContacts();
     }, []);
 
     const toggleAddContactForm = () => {
@@ -80,6 +109,8 @@ const ContactsPage = () => {
                         setSuccessMessage('Contact added successfully');
                         setShowAddContactForm(false);
                         setNewContactPhone('');
+                        fetchContacts(); // Refresh the contact list
+
                     } else {
                         // Handle errors, check if the response has an "error" key
                         if (data && data.error) {
@@ -125,22 +156,27 @@ const ContactsPage = () => {
 
     return (
         <div className="contacts-page">
+            {successMessage && <div className="success-message">{successMessage}</div>}
+
+            {/* Display Error Message */}
+            {error && <div className="error-message">{error}</div>}
             <button className="navigate-profile" onClick={navigateToProfile}>
                 <img src={profileIcon} alt="Profile"/>
             </button>
             <div className="add-contact-container">
                 <button className="add-contact" onClick={() => setShowAddContactForm(!showAddContactForm)}>+</button>
                 {showAddContactForm && (
-                    <form onSubmit={(e) => e.preventDefault()}>
+                    <form onSubmit={handleAddContact}>
                         <input
                             type="text"
                             value={newContactPhone}
-                            onChange={(e) => setNewContactPhone(e.target.value)}
+                            onChange={handleNewContactPhoneChange}
                             placeholder="Enter phone number"
                         />
                         <button type="submit" className="create-contact">Create Contact</button>
                     </form>
                 )}
+
             </div>
             <ul className="chat-list">
                 {contacts.map(contact => (
