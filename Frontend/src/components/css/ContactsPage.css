@@ -1,9 +1,11 @@
-/* ContactsPage.css */
 .contacts-container {
-    margin: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    background-color: white;
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    font-family: 'Arial', sans-serif;
 }
 
 .contacts-container ul {
@@ -13,6 +15,52 @@
 
 .contacts-container li {
     margin-bottom: 10px;
-    padding: 5px;
+    padding: 10px;
     border-bottom: 1px solid #eee;
+    font-size: 16px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input[type="text"] {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.success-message, .error-message {
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.success-message {
+    background-color: #4CAF50;
+}
+
+.error-message {
+    background-color: #f44336;
 }
