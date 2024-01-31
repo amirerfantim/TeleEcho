@@ -20,13 +20,13 @@ func CreateGroup(c echo.Context) error {
 	userID := c.Get("id").(string)
 	userIDInt, err := strconv.ParseUint(userID, 10, 0)
 	if err != nil {
-		fmt.Printf("Error while parsing user id:%s\n", err)
+		logrus.Printf("Error while parsing user id:%s\n", err)
 		return c.JSON(http.StatusBadRequest, "User id is wrong")
 	}
 	groupName := c.FormValue("name")
 	groupExist, err := database.DoesGroupExist(uint(userIDInt), groupName)
 	if err != nil {
-		fmt.Printf("Error while checking groups:%s\n", err)
+		logrus.Printf("Error while checking groups:%s\n", err)
 		return c.JSON(http.StatusInternalServerError, "Can not check your groups")
 	}
 	if groupExist {
@@ -55,14 +55,14 @@ func AddUserToGroup(c echo.Context) error {
 	userID := c.Get("id").(string)
 	userIDInt, err := strconv.ParseUint(userID, 10, 0)
 	if err != nil {
-		fmt.Printf("Error while parsing user id:%s\n", err)
+		logrus.Printf("Error while parsing user id:%s\n", err)
 		return c.JSON(http.StatusBadRequest, "User id is wrong")
 	}
 	groupID := c.FormValue("groupID")
 	username := c.FormValue("username")
 	groupIDInt, err := strconv.ParseUint(groupID, 10, 0)
 	if err != nil {
-		fmt.Printf("Error while parsing group id:%s\n", err)
+		logrus.Printf("Error while parsing group id:%s\n", err)
 		return c.JSON(http.StatusBadRequest, "Group id is wrong")
 	}
 	isUserGroup, err := database.IsUserInGroup(uint(userIDInt), uint(groupIDInt))
@@ -100,7 +100,7 @@ func GetUserGroups(c echo.Context) error {
 	userID := c.Get("id").(string)
 	userIDInt, err := strconv.ParseUint(userID, 10, 0)
 	if err != nil {
-		fmt.Printf("Error while parsing user id:%s\n", err)
+		logrus.Printf("Error while parsing user id:%s\n", err)
 		return c.JSON(http.StatusBadRequest, "User id is wrong")
 	}
 	groups, err := database.GetUserGroups(uint(userIDInt))
@@ -155,7 +155,7 @@ func RemoveUserGroup(c echo.Context) error {
 	userID := c.Get("id").(string)
 	userIDInt, err := strconv.ParseUint(userID, 10, 0)
 	if err != nil {
-		fmt.Printf("Error while parsing user id:%s\n", err)
+		logrus.Printf("Error while parsing user id:%s\n", err)
 		return c.JSON(http.StatusBadRequest, "User id is wrong")
 	}
 
@@ -163,14 +163,14 @@ func RemoveUserGroup(c echo.Context) error {
 	username := c.FormValue("username")
 	groupIDInt, err := strconv.ParseUint(groupID, 10, 0)
 	if err != nil {
-		fmt.Printf("Error while parsing group id:%s\n", err)
+		logrus.Printf("Error while parsing group id:%s\n", err)
 		return c.JSON(http.StatusBadRequest, "Group id is wrong")
 	}
 
 	if username != "" {
 		groupExist, err := database.DoesGroupExistByID(uint(userIDInt), uint(groupIDInt))
 		if err != nil {
-			fmt.Printf("Error while checking groups:%s\n", err)
+			logrus.Printf("Error while checking groups:%s\n", err)
 			return c.JSON(http.StatusInternalServerError, "Can not check your groups")
 		}
 		if !groupExist {
