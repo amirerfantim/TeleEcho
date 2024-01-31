@@ -4,6 +4,7 @@ import LoginForm from './components/LoginForm';
 import Profile from './components/Profile';
 import React from "react";
 import ContactsPage from "./components/ContactsPage";
+import GroupsPage from "./components/GroupsPage";
 
 const App: React.FC = () => {
     return (
@@ -13,6 +14,7 @@ const App: React.FC = () => {
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/contacts" element={<ContactsPage />} />
+                <Route path="/group" element={<GroupsPage />} />
 
             </Routes>
         </Router>

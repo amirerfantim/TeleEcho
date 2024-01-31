@@ -1,0 +1,42 @@
+.groups-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.groups-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.group-card {
+    width: 200px; /* Adjust size as needed */
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.group-card img {
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+.add-group {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    /* Style similarly to the profile add button */
+}
+
+.navigate-group {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    /* Style your navigation button */
+}
