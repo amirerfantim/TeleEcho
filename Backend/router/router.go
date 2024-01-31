@@ -33,6 +33,7 @@ func New() *echo.Echo {
 	groupHandlersGroup := e.Group("/group", myMiddleware.ValidateJWT)
 	groupHandlersGroup.POST("", handlers.CreateGroup)
 	groupHandlersGroup.GET("", handlers.GetUserGroups)
+	groupHandlersGroup.PATCH("", handlers.AddUserToGroup)
 
 	return e
 }

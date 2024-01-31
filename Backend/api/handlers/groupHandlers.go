@@ -51,6 +51,43 @@ func CreateGroup(c echo.Context) error {
 		return c.JSON(http.StatusCreated, "Group created successfully.")
 	}
 }
+func AddUserToGroup(c echo.Context) error {
+	userID := c.Get("id").(string)
+	userIDInt, err := strconv.ParseUint(userID, 10, 0)
+	if err != nil {
+		fmt.Printf("Error while parsing user id:%s\n", err)
+		return c.JSON(http.StatusBadRequest, "User id is wrong")
+	}
+	groupID := c.FormValue("groupID")
+	groupIDInt, err := strconv.ParseUint(groupID, 10, 0)
+	if err != nil {
+		fmt.Printf("Error while parsing group id:%s\n", err)
+		return c.JSON(http.StatusBadRequest, "Group id is wrong")
+	}
+	isUserGroup, err := database.IsUserInGroup(uint(userIDInt), uint(groupIDInt))
+	if !isUserGroup {
+		return c.JSON(http.StatusBadRequest, fmt.Sprintf("You don't have group with group id %d", groupIDInt))
+	}
+	username := c.FormValue("username")
+	searchedUser, err := database.GetUserByUsername(username)
+	if err != nil {
+		if errors.Is(err, database.NotFoundUser) {
+			return c.JSON(http.StatusBadRequest, fmt.Sprintf("No user found with username %s", username))
+		}
+		return c.JSON(http.StatusInternalServerError, "Error while finding user")
+	}
+	isUserGroup, err = database.IsUserInGroup(searchedUser.ID, uint(groupIDInt))
+	if isUserGroup {
+		return c.JSON(http.StatusBadRequest, fmt.Sprintf("You already have group with group id %d", groupIDInt))
+	}
+	err = database.AddUserToGroup(searchedUser.ID, uint(groupIDInt))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": "Failed to add user to group",
+		})
+	}
+	return c.JSON(http.StatusCreated, "User added to the group successfully.")
+}
 func GetUserGroups(c echo.Context) error {
 	groupName := c.FormValue("name")
 	userID := c.Get("id").(string)
