@@ -2,7 +2,7 @@
     background-color: white;
     margin: 20px auto;
     padding: 20px;
-    max-width: 600px;
+    width: 300px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     font-family: 'Arial', sans-serif;
@@ -63,4 +63,47 @@ input[type="text"] {
 
 .error-message {
     background-color: #f44336;
+}
+
+.contact-card {
+    background-color: #f9f9f9;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    width: 100%; /* Set width to full container width */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contact-card:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.05);
+}
+
+.delete-button {
+    background-color: transparent;
+    border: 2px solid black;
+    border-radius: 50%; /* Ensure circular shape */
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 5px; /* Remove padding */
+}
+
+.delete-button:hover {
+    background-color: red;
+    border-color: red;
+}
+
+.delete-button img {
+    width: 100%; /* Ensure the image covers the button */
+    height: 100%;
+    object-fit: cover; /* This will make sure the image covers the button area */
 }

@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './css/ContactsPage.css';
+import deleteIcon from '../assets/delete_icon.png'; // Import your PNG icon here
+
 
 interface Contact {
     id: number;
-    name: string;
+    username: string;
+    firstname: string;
+    lastname: string;
     phone: string;
 }
 
@@ -84,6 +88,33 @@ const ContactsPage = () => {
             });
     };
 
+    const deleteContact = (username: string) => {
+        if (window.confirm('Are you sure you want to delete this contact?')) {
+            fetch(`http://127.0.0.1:8020/contacts?username=${encodeURIComponent(username)}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': '' + localStorage.getItem('token'),
+                },
+            })
+                .then(response => {
+                    if (response.ok) {
+                        setSuccessMessage('Contact deleted successfully');
+                        // Remove the contact from the state
+                        setContacts(contacts.filter(contact => contact.username !== username));
+                    } else {
+                        return response.json().then(data => {
+                            if (data && data.error) {
+                                throw new Error(data.error);
+                            }
+                            throw new Error('An error occurred while deleting the contact.');
+                        });
+                    }
+                })
+                .catch(error => setError(error.message));
+        }
+    };
+
     return (
         <div className="contacts-container">
             {successMessage && <p className="success-message">{successMessage}</p>}
@@ -102,7 +133,16 @@ const ContactsPage = () => {
             )}
             <ul>
                 {contacts.map(contact => (
-                    <li key={contact.id}>{contact.name} - {contact.phone}</li>
+                    <li key={contact.id} className="contact-card">
+                        <div className="contact-info">
+                            <div>{contact.firstname} {contact.lastname}</div>
+                            <div>@{contact.username}</div>
+                            <div>{contact.phone}</div>
+                        </div>
+                        <button onClick={() => deleteContact(contact.username)} className="delete-button">
+                            <img src={deleteIcon} alt="Delete"/> {/* Use the imported icon */}
+                        </button>
+                    </li>
                 ))}
             </ul>
         </div>
