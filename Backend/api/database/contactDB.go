@@ -29,6 +29,27 @@ func GetUserContacts(userID uint) ([]model.Contact, error) {
 	}
 	return contacts, nil
 }
+func DoesUserHaveContact(userID, contactID uint) (bool, error) {
+	var contact model.Contact
+	result := DB.Where("user_id = ? AND contact_user_id = ?", userID, contactID).First(&contact)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			logrus.WithFields(logrus.Fields{
+				"userID":    userID,
+				"contactID": contactID,
+			}).Info("No contact record found")
+			return false, nil
+		}
+		logrus.WithFields(logrus.Fields{
+			"error":     result.Error,
+			"userID":    userID,
+			"contactID": contactID,
+		}).Error("Error occurred while checking contact")
+		return false, result.Error
+	}
+	return true, nil
+}
 func DeleteUserContact(userID uint, contactUserID uint) error {
 	var contact model.Contact
 	err := DB.Where("contact_user_id = ? AND user_id = ?", contactUserID, userID).First(&contact).Error

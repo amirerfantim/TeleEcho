@@ -32,6 +32,15 @@ func CreateContact(c echo.Context) error {
 	if uint(userIDInt) == contactUser.ID {
 		return c.JSON(http.StatusBadRequest, "Phone number is yours")
 	}
+	doesUserHaveContact, err := database.DoesUserHaveContact(uint(userIDInt), contactUser.ID)
+	if err != nil {
+		logrus.Printf("Error while checking contact for user")
+		return c.JSON(http.StatusInternalServerError, "Can not check contact")
+
+	}
+	if doesUserHaveContact {
+		return c.JSON(http.StatusBadRequest, fmt.Sprintf("You have already this contact with with user id %d", userIDInt))
+	}
 	status := model.Status{ProfilePictureHide: false, PhoneNumberHide: false, IsBlocked: false}
 	err = database.CreateContact(uint(userIDInt), contactUser.ID, status)
 	if err != nil {
