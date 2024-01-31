@@ -180,7 +180,6 @@ const ContactsPage = () => {
             {error && <div className="error-message">{error}</div>}
             {successMessage && <div className="success-message">{successMessage}</div>}
 
-
             <ul className="contacts-container">
                 {contacts.map(contact => (
                     <li key={contact.id} className="contact-card">

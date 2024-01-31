@@ -4,6 +4,7 @@ import './css/GroupsPage.css';
 import profileIcon from "../assets/profile.png";
 import groupIcon from "../assets/group.png";
 import contactIcon from "../assets/contact.png";
+import deleteIcon from "../assets/delete_icon.png";
 
 interface Group {
     id: number;
@@ -91,6 +92,35 @@ const GroupsPage: React.FC = () => {
         }
     };
 
+
+    const handleDeleteGroup = async (groupId: number) => {
+        // Show confirmation dialog
+        const confirmDelete = window.confirm("Are you sure you want to delete this group?");
+        if (!confirmDelete) {
+            return; // Stop the function if user does not confirm
+        }
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8020/group?groupID=${groupId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': '' + localStorage.getItem('token'), // Replace with your auth token
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            // Remove the group from the state
+            setGroups(groups.filter(group => group.id !== groupId));
+        } catch (error) {
+            console.error('There has been a problem with your delete operation:', error);
+        }
+    };
+
+
     const navigateToGroup = (groupId: number) => {
         navigate(`/group/${groupId}`);
     };
@@ -109,6 +139,12 @@ const GroupsPage: React.FC = () => {
                     <div key={group.id} className="group-card" onClick={() => navigateToGroup(group.id)}>
                         <h3>{group.name}</h3>
                         <p>{group.description}</p>
+                        <button className="delete-button" onClick={(e) => {
+                            e.stopPropagation(); // Prevents navigating to the group detail page
+                            handleDeleteGroup(group.id);
+                        }}>
+                            <img src={deleteIcon} alt="Delete"/>
+                        </button>
                     </div>
                 ))}
             </div>
