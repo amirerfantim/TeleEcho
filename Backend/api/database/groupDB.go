@@ -61,3 +61,42 @@ func GetUserGroups(userID uint) ([]model.Group, error) {
 	return groups, nil
 
 }
+func AddUserToGroup(userID, groupID uint) error {
+	userGroup := model.UserGroup{
+		UserID:  userID,
+		GroupID: groupID,
+	}
+
+	result := DB.Create(&userGroup)
+	if result.Error != nil {
+		logrus.WithFields(logrus.Fields{
+			"userID":  userID,
+			"groupID": groupID,
+			"error":   result.Error,
+		}).Error("Failed to add user to group")
+		return result.Error
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"userID":  userID,
+		"groupID": groupID,
+	}).Info("User added to group successfully")
+	return nil
+}
+func IsUserInGroup(userID, groupID uint) (bool, error) {
+	var userGroup model.UserGroup
+	result := DB.Where("user_id = ? AND group_id = ?", userID, groupID).First(&userGroup)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		logrus.WithFields(logrus.Fields{
+			"userID":  userID,
+			"groupID": groupID,
+			"error":   result.Error,
+		}).Error("Error occurred while checking user group membership")
+		return false, result.Error
+	}
+	return true, nil
+}
