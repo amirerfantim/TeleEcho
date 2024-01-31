@@ -36,6 +36,11 @@ body, html {
     height: 200px; /* Increased size */
     object-fit: cover;
     border-radius: 50%;
+    transition: transform 0.4s ease;
+
+}
+.profile-picture:hover{
+    transform: scale(1.2);
 }
 
 .profile-picture-container:hover {

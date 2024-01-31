@@ -103,7 +103,7 @@ const GroupsPage: React.FC = () => {
             <button className="navigate-second" onClick={() => navigate('/contacts')}>
                 <img src={contactIcon} alt="Groups"/>
             </button>
-            <button className="add-contact" onClick={() => setShowAddGroupModal(true)}>+</button>
+            <button className="add-button-first" onClick={() => setShowAddGroupModal(true)}>+</button>
             <div className="groups-container">
                 {groups.map(group => (
                     <div key={group.id} className="group-card" onClick={() => navigateToGroup(group.id)}>

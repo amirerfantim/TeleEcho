@@ -5,6 +5,9 @@ import './css/Profile.css';
 import LoadingSpinner from "./LoadingSpinner";
 import groupIcon from "../assets/group.png";
 import contactIcon from "../assets/contact.png";
+import editIcon from "../assets/edit.png";
+import deleteIcon from "../assets/delete_icon.png";
+import cancelIcon from "../assets/cancel.png";
 
 
 interface User {
@@ -44,7 +47,13 @@ const Profile: React.FC = () => {
         }
     };
 
-    const CardContent: React.FC<CardContentProps> = ({ field, initialValue, saveChanges, setEditingField, isEditing }) => {
+    const CardContent: React.FC<CardContentProps> = ({
+                                                         field,
+                                                         initialValue,
+                                                         saveChanges,
+                                                         setEditingField,
+                                                         isEditing
+                                                     }) => {
         const [value, setValue] = useState(initialValue);
         const [isFieldEditing, setIsFieldEditing] = useState(false);
 
@@ -53,12 +62,9 @@ const Profile: React.FC = () => {
         };
 
         const handleSave = async () => {
-            await saveChanges({ [field]: value });
+            await saveChanges({[field]: value});
             setEditingField(null);
         };
-
-
-
 
 
         const handleEditClick = () => {
@@ -76,7 +82,7 @@ const Profile: React.FC = () => {
             <div className={`detail-card ${field}-card`}>
                 {isFieldEditing ? (
                     <>
-                        <input type="text" value={value} onChange={handleInputChange} />
+                        <input type="text" value={value} onChange={handleInputChange}/>
                         <div>
                             <button onClick={handleSave}>Save</button>
                             <button onClick={handleCancel}>Cancel</button>
@@ -129,7 +135,7 @@ const Profile: React.FC = () => {
 
 
     const deleteUser = async () => {
-        if(window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+        if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
             try {
                 const token = getToken();
                 const response = await fetch('http://127.0.0.1:8020/users', {
@@ -153,9 +159,6 @@ const Profile: React.FC = () => {
             }
         }
     };
-
-
-
 
 
     useEffect(() => {
@@ -222,7 +225,6 @@ const Profile: React.FC = () => {
     };
 
 
-
     if (errorMessage) {
         return <div className="profile-container error-container">
             <div className="alert alert-danger">
@@ -232,7 +234,7 @@ const Profile: React.FC = () => {
     }
 
     if (!user) {
-        return <LoadingSpinner />;
+        return <LoadingSpinner/>;
     }
 
 
@@ -261,29 +263,31 @@ const Profile: React.FC = () => {
                 )}
             </div>
             <div className="buttons-container">
-                <button className="btn btn-secondary edit-button" onClick={handleEditClick}>
-                    {isEditing ? "Cancel" : "Edit Profile"}
+                <button className="add-button-first" onClick={handleEditClick}>
+                    {isEditing ? <img src={cancelIcon} alt="Profile"/> : <img src={editIcon} alt="Profile"/>}
                 </button>
-                <button className="btn btn-danger button-container" onClick={deleteUser}>
-                    Delete Account
+                <button className="add-button-second" onClick={deleteUser}>
+                    <img src={deleteIcon} alt="Profile"/>
                 </button>
             </div>
 
-            {/* Content Fields */}
-            <CardContent
-                field="firstname"
-                initialValue={user.firstname}
-                saveChanges={saveChanges}
-                setEditingField={setEditingField}
-                isEditing={isEditing}
-            />
-            <CardContent
-                field="lastname"
-                initialValue={user.lastname}
-                saveChanges={saveChanges}
-                setEditingField={setEditingField}
-                isEditing={isEditing}
-            />
+            <div className="details-container">
+                <CardContent
+                    field="firstname"
+                    initialValue={user.firstname}
+                    saveChanges={saveChanges}
+                    setEditingField={setEditingField}
+                    isEditing={isEditing}
+                />
+                <CardContent
+                    field="lastname"
+                    initialValue={user.lastname}
+                    saveChanges={saveChanges}
+                    setEditingField={setEditingField}
+                    isEditing={isEditing}
+                />
+            </div>
+
             <div className="details-container">
                 <CardContent
                     field="username"

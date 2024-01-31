@@ -189,7 +189,7 @@ const ContactsPage = () => {
 
 
             <div className="add-contact-container">
-                <button className="add-contact" onClick={() => setShowAddContactForm(!showAddContactForm)}>+</button>
+                <button className="add-button-first" onClick={() => setShowAddContactForm(!showAddContactForm)}>+</button>
                 <Modal
                     show={showAddContactForm}
                     onClose={() => setShowAddContactForm(false)}

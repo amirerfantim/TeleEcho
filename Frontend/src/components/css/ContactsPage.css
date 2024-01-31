@@ -4,7 +4,7 @@
     padding: 20px;
     width: 300px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     font-family: 'Arial', sans-serif;
 }
 
@@ -76,7 +76,7 @@ input[type="text"] {
     margin-bottom: 15px;
     padding: 15px;
     border-radius: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, background-color 0.3s ease;
     width: 100%; /* Set width to full container width */
     display: flex;
@@ -138,7 +138,7 @@ input[type="text"] {
 
 .navigate-first:hover {
     background-color: powderblue;
-    transform: scale(1.3) ; /* Slightly enlarge on hover */
+    transform: scale(1.3); /* Slightly enlarge on hover */
 
 }
 
@@ -162,45 +162,83 @@ input[type="text"] {
 
 .navigate-second img {
     width: 70%; /* Adjust icon size */
-    height: 70%; /
-    object-fit: contain;
+    height: 70%;
+/ object-fit: contain;
 }
 
 .navigate-second:hover {
     background-color: powderblue;
-    transform: scale(1.3) ;
+    transform: scale(1.3);
 
 }
 
 
-.add-contact {
-    background-color: #f0f0f0; /* Match the color of the profile button */
-    color: black;
-    border-radius: 50%; /* Circular shape */
-    width: 40px; /* Same width as the profile button */
-    height: 40px; /* Same height as the profile button */
-    position: fixed;
-    bottom: 20px;
+.add-button-first {
+    background-color: #89cff0;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    position: absolute;
     right: 20px;
-    font-size: 24px; /* Adjust the size of the "+" */
+    bottom: 20px;
+    padding: 4px;
+    border: none;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
-    cursor: pointer;
     transition: transform 0.2s ease;
+    margin-bottom: 10px;
 }
 
-.add-contact:hover {
-    background-color: powderblue;
-    transform: scale(1.3); /* Same hover effect */
+.add-button-first img {
+    width: 70%; /* Adjust icon size */
+    height: 70%;
+    object-fit: contain;
 }
+
+.add-button-first:hover {
+    background-color: powderblue;
+    transform: scale(1.3);
+
+}
+
+.add-button-second {
+    background-color: #89cff0;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    right: 70px;
+    bottom: 20px;
+    padding: 4px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    margin-bottom: 10px;
+}
+
+.add-button-second img {
+    width: 70%; /* Adjust icon size */
+    height: 70%;
+    object-fit: contain;
+}
+
+.add-button-second:hover {
+    background-color: #FF6F69;
+    transform: scale(1.3);
+
+}
+
 
 .modal {
     position: fixed;
     top: 0;
     left: 0;
-    width:100%;
+    width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
     display: flex;
