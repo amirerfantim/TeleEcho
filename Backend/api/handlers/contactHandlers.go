@@ -2,13 +2,18 @@ package handlers
 
 import (
 	"TeleEcho/api/database"
+	"TeleEcho/api/services"
+	"TeleEcho/configs"
 	"TeleEcho/model"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -56,6 +61,8 @@ func GetUserContacts(c echo.Context) error {
 		fmt.Printf("Error while parsing user id:%s\n", err)
 		return c.JSON(http.StatusBadRequest, "User id is wrong")
 	}
+	contactUserID := c.QueryParam("id")
+
 	contacts, err := database.GetUserContactsInfo(uint(userIDInt))
 	if err != nil {
 		if errors.Is(err, database.NotFoundContact) {
@@ -63,6 +70,35 @@ func GetUserContacts(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, "Error while querying contact")
 	} else {
+		if contactUserID != "" {
+			contactUserIDInt, err := strconv.ParseUint(contactUserID, 10, 0)
+			if err != nil {
+				fmt.Printf("Error while parsing contact user id:%s\n", err)
+				return c.JSON(http.StatusBadRequest, "Contact user id is wrong")
+			}
+			for _, contact := range contacts {
+				if contact.ID == uint(contactUserIDInt) {
+					profilePhotoFile, err := services.DownloadS3(services.StorageSession, configs.Config.StorageServiceBucket, contact.ProfilePicture)
+					if err != nil {
+						logrus.Println("Can not download photo:", err)
+						return c.JSON(http.StatusInternalServerError, "Error while downloading photo.")
+					}
+					file, err := os.Open(profilePhotoFile.Name())
+					if err != nil {
+						logrus.Println("Can not open image file", err)
+						return c.JSON(http.StatusInternalServerError, "Error while processing photo.")
+					}
+					bytes, err := ioutil.ReadAll(file)
+					if err != nil {
+						logrus.Println("Can not convert photo to bytes.")
+						return c.JSON(http.StatusInternalServerError, "Error while processing photo.")
+					}
+					base64ProfilePicture := base64.StdEncoding.EncodeToString(bytes)
+					contact.ProfilePicture = base64ProfilePicture
+					return c.JSON(http.StatusOK, contact)
+				}
+			}
+		}
 		return c.JSON(http.StatusOK, contacts)
 	}
 }
