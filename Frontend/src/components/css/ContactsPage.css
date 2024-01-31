@@ -1,5 +1,4 @@
 .contacts-container {
-    background-color: white;
     margin: 20px auto;
     padding: 20px;
     width: 300px;
@@ -20,10 +19,22 @@
     font-size: 16px;
 }
 
+.centered-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100vh; /* Full viewport height */
+}
+
+
+/* Modify the .contacts-page class */
 .contacts-page {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Align items to the left */
+    align-items: center; /* Center items horizontally */
+    /* Add a max-width if you want to limit the width of the contact list */
+    max-width: 600px; /* Example width */
+    margin: 0 auto; /* Center the .contacts-page horizontally if the parent doesn't fill the viewport */
 }
 
 button {
@@ -68,7 +79,7 @@ input[type="text"] {
 }
 
 .error-message {
-    background-color: #f44336;
+    background-color: #FF6F69;
 }
 
 .contact-card {
@@ -103,7 +114,7 @@ input[type="text"] {
 }
 
 .delete-button:hover {
-    background-color: red;
+    background-color: #FF6F69;
 }
 
 .delete-button img {
@@ -268,3 +279,33 @@ input[type="text"] {
     padding: 10px;
 }
 
+.centered-contact-list {
+    display: flex;
+    flex-direction: column; /* Align children vertically */
+    justify-content: center; /* Center children vertically */
+    align-items: center; /* Center children horizontally */
+    height: 100vh; /* Full viewport height */
+    width: 100vw; /* Full viewport width */
+    text-align: center; /* Center text for all children */
+}
+
+/* Keep your existing styles for .contacts-container and other classes */
+
+
+/* Contact list container */
+.contacts-container {
+    padding: 20px;
+    width: 300px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+    list-style: none;
+}
+
+/* Individual contact item */
+.contacts-container li {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 16px;
+}

@@ -176,30 +176,12 @@ const ContactsPage = () => {
     };
 
     return (
-        <div className="contacts-page">
+        <div className="centered-contact-list">
+            {error && <div className="error-message">{error}</div>}
             {successMessage && <div className="success-message">{successMessage}</div>}
 
-            {error && <div className="error-message">{error}</div>}
-            <button className="navigate-first" onClick={navigateToProfile}>
-                <img src={profileIcon} alt="Profile"/>
-            </button>
-            <button className="navigate-second" onClick={navigateToGroups}>
-                <img src={groupIcon} alt="Groups"/>
-            </button>
 
-
-            <div className="add-contact-container">
-                <button className="add-button-first" onClick={() => setShowAddContactForm(!showAddContactForm)}>+</button>
-                <Modal
-                    show={showAddContactForm}
-                    onClose={() => setShowAddContactForm(false)}
-                    onAddContact={handleAddContact}
-                    newContactPhone={newContactPhone}
-                    handleNewContactPhoneChange={handleNewContactPhoneChange}
-                />
-
-            </div>
-            <ul className="chat-list">
+            <ul className="contacts-container">
                 {contacts.map(contact => (
                     <li key={contact.id} className="contact-card">
                         <div className="contact-info">
@@ -212,9 +194,26 @@ const ContactsPage = () => {
                     </li>
                 ))}
             </ul>
+
+            {/* Other elements like navigation buttons and add contact form */}
+            <button className="navigate-first" onClick={navigateToProfile}>
+                <img src={profileIcon} alt="Profile"/>
+            </button>
+            <button className="navigate-second" onClick={navigateToGroups}>
+                <img src={groupIcon} alt="Groups"/>
+            </button>
+            <div className="add-contact-container">
+                <button className="add-button-first" onClick={() => setShowAddContactForm(!showAddContactForm)}>+</button>
+                <Modal
+                    show={showAddContactForm}
+                    onClose={() => setShowAddContactForm(false)}
+                    onAddContact={handleAddContact}
+                    newContactPhone={newContactPhone}
+                    handleNewContactPhoneChange={handleNewContactPhoneChange}
+                />
+            </div>
         </div>
     );
-
 };
 
 export default ContactsPage;
