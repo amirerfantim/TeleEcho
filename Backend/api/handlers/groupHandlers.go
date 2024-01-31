@@ -160,49 +160,71 @@ func RemoveUserGroup(c echo.Context) error {
 	}
 
 	groupID := c.FormValue("groupID")
+	username := c.FormValue("username")
 	groupIDInt, err := strconv.ParseUint(groupID, 10, 0)
 	if err != nil {
 		fmt.Printf("Error while parsing group id:%s\n", err)
 		return c.JSON(http.StatusBadRequest, "Group id is wrong")
 	}
 
-	groupExist, err := database.DoesGroupExistByID(uint(userIDInt), uint(groupIDInt))
-	if err != nil {
-		fmt.Printf("Error while checking groups:%s\n", err)
-		return c.JSON(http.StatusInternalServerError, "Can not check your groups")
-	}
-	if !groupExist {
-		return c.JSON(http.StatusBadRequest, "You can not remove user from this group")
-	}
-
-	username := c.FormValue("username")
-	searchedUser, err := database.GetUserByUsername(username)
-	if err != nil {
-		if errors.Is(err, database.NotFoundUser) {
-			return c.JSON(http.StatusBadRequest, fmt.Sprintf("No user found with username %s", username))
+	if username != "" {
+		groupExist, err := database.DoesGroupExistByID(uint(userIDInt), uint(groupIDInt))
+		if err != nil {
+			fmt.Printf("Error while checking groups:%s\n", err)
+			return c.JSON(http.StatusInternalServerError, "Can not check your groups")
 		}
-		return c.JSON(http.StatusInternalServerError, "Error while finding user")
-	}
-	if searchedUser.ID == uint(userIDInt) {
-		return c.JSON(http.StatusBadRequest, fmt.Sprintf("This user id is yours: %d", userIDInt))
-	}
+		if !groupExist {
+			return c.JSON(http.StatusBadRequest, "You can not remove user from this group")
+		}
 
-	isUserInGroup, err := database.IsUserInGroup(searchedUser.ID, uint(groupIDInt))
-	if err != nil {
-		logrus.Printf("Error while checking user group :%e", err)
-		return c.JSON(http.StatusInternalServerError, "Can not check user group")
-	}
-	if !isUserInGroup {
-		return c.JSON(http.StatusBadRequest, fmt.Sprintf("This user doesn't have group with group id %d", groupIDInt))
-	}
-	err = database.RemoveUserFromGroup(searchedUser.ID, uint(groupIDInt))
-	if err != nil {
-		if errors.Is(err, database.NotUserInGroup) {
+		searchedUser, err := database.GetUserByUsername(username)
+		if err != nil {
+			if errors.Is(err, database.NotFoundUser) {
+				return c.JSON(http.StatusBadRequest, fmt.Sprintf("No user found with username %s", username))
+			}
+			return c.JSON(http.StatusInternalServerError, "Error while finding user")
+		}
+		if searchedUser.ID == uint(userIDInt) {
+			return c.JSON(http.StatusBadRequest, fmt.Sprintf("This user id is yours: %d", userIDInt))
+		}
+
+		isUserInGroup, err := database.IsUserInGroup(searchedUser.ID, uint(groupIDInt))
+		if err != nil {
+			logrus.Printf("Error while checking user group :%e", err)
+			return c.JSON(http.StatusInternalServerError, "Can not check user group")
+		}
+		if !isUserInGroup {
 			return c.JSON(http.StatusBadRequest, fmt.Sprintf("This user doesn't have group with group id %d", groupIDInt))
 		}
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": "Failed to add user to group",
-		})
+		err = database.RemoveUserFromGroup(searchedUser.ID, uint(groupIDInt))
+		if err != nil {
+			if errors.Is(err, database.NotUserInGroup) {
+				return c.JSON(http.StatusBadRequest, fmt.Sprintf("This user doesn't have group with group id %d", groupIDInt))
+			}
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"error": "Failed to add user to group",
+			})
+		}
+		return c.JSON(http.StatusCreated, "User removed from the group successfully.")
+	} else {
+		isUserInGroup, err := database.IsUserInGroup(uint(userIDInt), uint(groupIDInt))
+		if err != nil {
+			logrus.Printf("Error while checking user group :%e", err)
+			return c.JSON(http.StatusInternalServerError, "Can not check user group")
+		}
+		if !isUserInGroup {
+			return c.JSON(http.StatusBadRequest, fmt.Sprintf("You don't have group with group id %d", groupIDInt))
+		}
+		err = database.RemoveUserFromGroup(uint(userIDInt), uint(groupIDInt))
+		if err != nil {
+			if errors.Is(err, database.NotUserInGroup) {
+				return c.JSON(http.StatusBadRequest, fmt.Sprintf("You don't have group with group id d %d", groupIDInt))
+			}
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"error": "Failed to add user to group",
+			})
+		}
+		return c.JSON(http.StatusCreated, "The group deleted successfully.")
 	}
-	return c.JSON(http.StatusCreated, "User removed from the group successfully.")
+
 }
