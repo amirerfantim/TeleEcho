@@ -30,10 +30,27 @@ func DoesGroupExist(adminUserID uint, groupName string) (bool, error) {
 	var count int64
 	err := DB.Model(&model.Group{}).Where("admin_user_id = ? AND name = ?", adminUserID, groupName).Count(&count).Error
 	if err != nil {
-		logrus.Printf("Error while checking user groups: %s", err)
+		logrus.WithFields(logrus.Fields{
+			"adminUserID": adminUserID,
+			"groupName":   groupName,
+			"error":       err,
+		}).Error("Error while checking for group existence")
 		return false, err
 	}
-	return count == 0, nil
+	return count > 0, nil
+}
+func DoesGroupExistByID(adminUserID, groupID uint) (bool, error) {
+	var count int64
+	err := DB.Model(&model.Group{}).Where("admin_user_id = ? AND id = ?", adminUserID, groupID).Count(&count).Error
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"adminUserID": adminUserID,
+			"id":          groupID,
+			"error":       err,
+		}).Error("Error while checking for group existence")
+		return false, err
+	}
+	return count > 0, nil
 }
 
 func GetUserGroups(userID uint) ([]model.Group, error) {
@@ -99,4 +116,28 @@ func IsUserInGroup(userID, groupID uint) (bool, error) {
 		return false, result.Error
 	}
 	return true, nil
+}
+func RemoveUserFromGroup(userID, groupID uint) error {
+	result := DB.Where("user_id = ? AND group_id = ?", userID, groupID).Delete(&model.UserGroup{})
+	if result.Error != nil {
+		logrus.WithFields(logrus.Fields{
+			"userID":  userID,
+			"groupID": groupID,
+			"error":   result.Error,
+		}).Error("Failed to remove user from group")
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		logrus.WithFields(logrus.Fields{
+			"userID":  userID,
+			"groupID": groupID,
+		}).Warn("No user-group relation found to delete")
+		return NotUserInGroup
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"userID":  userID,
+		"groupID": groupID,
+	}).Info("User removed from group successfully")
+	return nil
 }

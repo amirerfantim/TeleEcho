@@ -34,6 +34,7 @@ func New() *echo.Echo {
 	groupHandlersGroup.POST("", handlers.CreateGroup)
 	groupHandlersGroup.GET("", handlers.GetUserGroups)
 	groupHandlersGroup.PATCH("", handlers.AddUserToGroup)
+	groupHandlersGroup.DELETE("", handlers.RemoveUserGroup)
 
 	return e
 }
