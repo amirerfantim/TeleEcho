@@ -34,6 +34,7 @@ const GroupsPage: React.FC = () => {
     const [showAddUsersModal, setShowAddUsersModal] = useState(false);
     const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
     const [error, setError] = useState('');
+    const [responseMessage, setResponseMessage] = useState('');
 
     const fetchGroups = async () => {
         try {
@@ -122,11 +123,11 @@ const GroupsPage: React.FC = () => {
                 body: formData,
             });
 
+            setShowAddGroupModal(false);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             await response.json();
-            setShowAddGroupModal(false);
             setNewGroupName('');
             setNewGroupDescription('');
             setGroupProfilePicture(null);
@@ -174,23 +175,29 @@ const GroupsPage: React.FC = () => {
                 method: 'PATCH',
                 headers: {
                     'Authorization': '' + localStorage.getItem('token'),
-                    // 'Content-Type': 'multipart/form-data' is not needed, browser sets it along with the correct boundary
                 },
                 body: formData,
             })
                 .then(response => {
+                    setShowAddUsersModal(false);
                     if (!response.ok) {
-                        throw new Error('Failed to add user to group');
+                        // Extracting error message from response
+                        return response.text().then(text => {
+                            throw new Error(text || 'Failed to add user to group');
+                        });
                     }
                     return response.json();
                 })
                 .then(() => {
-                    setShowAddUsersModal(false);
+                    setResponseMessage('User added to the group successfully.');
                     fetchGroups();
                 })
-                .catch(error => setError(error.message));
+                .catch(error => {
+                    setResponseMessage(error.message);
+                });
         }
     };
+
 
 
 
@@ -207,6 +214,10 @@ const GroupsPage: React.FC = () => {
                 <img src={contactIcon} alt="Groups"/>
             </button>
             <button className="add-button-first" onClick={() => setShowAddGroupModal(true)}>+</button>
+
+            {responseMessage && (
+                <div className="response-message">{responseMessage}</div>
+            )}
 
             <div className="groups-container">
                 {groups.map(group => (

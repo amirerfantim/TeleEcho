@@ -63,3 +63,11 @@
     justify-content: center;
     align-items: center;
 }
+
+.response-message {
+    color: #333;
+/ / or any color you prefer padding: 10 px;
+    margin-bottom: 20px;
+    text-align: center;
+/ / Add more styling as needed
+}
