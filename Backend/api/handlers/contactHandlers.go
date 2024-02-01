@@ -158,6 +158,6 @@ func ChangeContentStatus(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, "Error while deleting contact")
 	} else {
-		return c.JSON(http.StatusNoContent, "")
+		return c.JSON(http.StatusOK, "Status changes successfully")
 	}
 }
