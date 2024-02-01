@@ -41,11 +41,13 @@ func New() *echo.Echo {
 	groupChatHandlersGroup.POST("", handlers.CreateGroupChat)
 	groupChatHandlersGroup.DELETE("", handlers.DeleteGroupChatHandler)
 	groupChatHandlersGroup.GET("", handlers.GetGroupChatMessagesHandler)
+
 	directChatHandlersGroup := e.Group("/chat", myMiddleware.ValidateJWT)
 	directChatHandlersGroup.POST("", handlers.CreateDirectChat)
 	directChatHandlersGroup.DELETE("", handlers.DeleteDirectChatHandler)
 	directChatHandlersGroup.GET("/message", handlers.GetDirectChatMessagesHandler)
 	directChatHandlersGroup.DELETE("/message", handlers.DeleteMessageHandler)
+
 	e.GET("/all-chat", handlers.GetDirectChatsWs)
 	e.GET("/write-message", handlers.NewChatMessageWs)
 	e.GET("/read-message", handlers.GetMessageByCountWs)
