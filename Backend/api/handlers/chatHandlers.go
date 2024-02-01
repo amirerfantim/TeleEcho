@@ -121,7 +121,7 @@ func NewChatMessageWs(c echo.Context) error {
 	}
 	defer ws.Close()
 
-	senderID := c.Get("id").(string)
+	senderID := c.QueryParam("id")
 	senderIDInt, err := strconv.ParseUint(senderID, 10, 0)
 	if err != nil {
 		ws.WriteMessage(websocket.TextMessage, []byte("User id is wrong"))
@@ -195,7 +195,7 @@ func GetMessageByCountWs(c echo.Context) error {
 	}
 	defer ws.Close()
 
-	receiverID := c.Get("id").(string)
+	receiverID := c.QueryParam("id")
 	receiverIDInt, err := strconv.ParseUint(receiverID, 10, 0)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to validate JWT")
@@ -272,7 +272,7 @@ func GetDirectChatsWs(c echo.Context) error {
 	}
 	defer ws.Close()
 
-	userID := c.Get("id").(string)
+	userID := c.QueryParam("id")
 	userIDInt, err := strconv.ParseUint(userID, 10, 0)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to validate JWT")
