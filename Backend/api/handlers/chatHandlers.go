@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"TeleEcho/api/database"
+	"TeleEcho/middleware"
 	"TeleEcho/model"
 	"errors"
 	"fmt"
@@ -121,14 +122,13 @@ func NewChatMessageWs(c echo.Context) error {
 	}
 	defer ws.Close()
 
-	senderID := c.QueryParam("id")
-	senderIDInt, err := strconv.ParseUint(senderID, 10, 0)
-	if err != nil {
-		ws.WriteMessage(websocket.TextMessage, []byte("User id is wrong"))
-		logrus.WithError(err).Error("Error while parsing user id")
-		return err
+	senderIDInt, checkJWT := middleware.ValidateJWTToken(c.QueryParam("token"))
+	if !checkJWT {
+		logrus.WithError(err).Error("Failed to validate JWT")
+		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
+		return echo.ErrUnauthorized
 	}
-
+	
 	chatID, err := strconv.ParseUint(c.QueryParam("chatID"), 10, 0)
 	if err != nil {
 		ws.WriteMessage(websocket.TextMessage, []byte("Chat id is wrong"))
@@ -195,9 +195,8 @@ func GetMessageByCountWs(c echo.Context) error {
 	}
 	defer ws.Close()
 
-	receiverID := c.QueryParam("id")
-	receiverIDInt, err := strconv.ParseUint(receiverID, 10, 0)
-	if err != nil {
+	receiverIDInt, checkJWT := middleware.ValidateJWTToken(c.QueryParam("token"))
+	if !checkJWT {
 		logrus.WithError(err).Error("Failed to validate JWT")
 		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
 		return echo.ErrUnauthorized
@@ -272,13 +271,13 @@ func GetDirectChatsWs(c echo.Context) error {
 	}
 	defer ws.Close()
 
-	userID := c.QueryParam("id")
-	userIDInt, err := strconv.ParseUint(userID, 10, 0)
-	if err != nil {
+	userIDInt, checkJWT := middleware.ValidateJWTToken(c.QueryParam("token"))
+	if !checkJWT {
 		logrus.WithError(err).Error("Failed to validate JWT")
 		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
 		return echo.ErrUnauthorized
 	}
+
 	sendUpdatedChats := func() error {
 
 		receiverChats, err := database.GetChatsByReceiverID(uint(userIDInt))
