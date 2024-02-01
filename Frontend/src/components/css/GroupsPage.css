@@ -71,3 +71,8 @@
     text-align: center;
 / / Add more styling as needed
 }
+
+.group-user {
+    font-size: 12px; /* Adjust the font size as needed */
+    margin: 5px 0; /* Add some margin for spacing */
+}

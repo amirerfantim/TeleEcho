@@ -13,7 +13,9 @@ interface Group {
     name: string;
     description: string;
     profilePicture: string;
+    users: Contact[]; // Add this line to include users in each group
 }
+
 
 interface Contact {
     id: number;
@@ -36,26 +38,42 @@ const GroupsPage: React.FC = () => {
     const [error, setError] = useState('');
     const [responseMessage, setResponseMessage] = useState('');
 
-    const fetchGroups = async () => {
+    const fetchGroupsAndUsers = async () => {
         try {
             const response = await fetch('http://127.0.0.1:8020/group', {
                 method: 'GET',
                 headers: {
-                    'Authorization': '' + localStorage.getItem('token'), // Replace with your auth token
+                    'Authorization': '' + localStorage.getItem('token'),
                 },
             });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            const data = await response.json();
-            setGroups(data);
+            const groupsData = await response.json();
+
+            const groupsWithUsers = await Promise.all(groupsData.map(async (group: Group) => {
+                const usersResponse = await fetch(`http://127.0.0.1:8020/group/all?groupID=${group.id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': '' + localStorage.getItem('token'),
+                    },
+                });
+                if (!usersResponse.ok) {
+                    throw new Error('Failed to fetch users for group ' + group.id);
+                }
+                const users = await usersResponse.json();
+                return { ...group, users }; // Add the users to the group object
+            }));
+
+            setGroups(groupsWithUsers);
         } catch (error) {
             console.error('There has been a problem with your fetch operation:', error);
         }
     };
 
+
     useEffect(() => {
-        fetchGroups();
+        fetchGroupsAndUsers();
     }, []);
 
     const handleNewGroupNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,7 +154,7 @@ const GroupsPage: React.FC = () => {
             setNewGroupName('');
             setNewGroupDescription('');
             setGroupProfilePicture(null);
-            fetchGroups(); // Refresh the groups list
+            fetchGroupsAndUsers(); // Refresh the groups list
         } catch (error) {
             if (error instanceof Error) {
                 setResponseMessage(error.message);
@@ -200,7 +218,7 @@ const GroupsPage: React.FC = () => {
                 })
                 .then(() => {
                     setResponseMessage('User added to the group successfully.');
-                    fetchGroups();
+                    fetchGroupsAndUsers();
                 })
                 .catch(error => {
                     setResponseMessage(error.message);
@@ -234,6 +252,14 @@ const GroupsPage: React.FC = () => {
                     <div key={group.id} className="group-card" onClick={() => navigateToGroup(group.id)}>
                         <h3>{group.name}</h3>
                         <p>{group.description}</p>
+                        {/* Display users for each group */}
+                        <div className="group-users">
+                            {group.users && group.users.map(user => (
+                                <div key={user.id} className="group-user">
+                                    {user.firstname} {user.lastname}
+                                </div>
+                            ))}
+                        </div>
                         <div className="group-card-actions">
                             <button className="delete-button" onClick={(e) => {
                                 e.stopPropagation(); // Prevents navigating to the group detail page
@@ -307,6 +333,7 @@ const GroupsPage: React.FC = () => {
             )}
         </div>
     );
+
 
 
 };
