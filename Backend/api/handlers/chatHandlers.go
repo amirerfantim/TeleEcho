@@ -2,12 +2,22 @@ package handlers
 
 import (
 	"TeleEcho/api/database"
+	"TeleEcho/model"
+	"errors"
 	"fmt"
+	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"sort"
 	"strconv"
 )
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
 func CreateDirectChat(c echo.Context) error {
 	userID := c.Get("id").(string)
@@ -102,4 +112,155 @@ func DeleteGroupChatHandler(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusOK)
+}
+func NewChatMessageWs(c echo.Context) error {
+	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to upgrade to WebSocket")
+		return err
+	}
+	defer ws.Close()
+
+	senderID := c.Get("id").(string)
+	senderIDInt, err := strconv.ParseUint(senderID, 10, 0)
+	if err != nil {
+		ws.WriteMessage(websocket.TextMessage, []byte("User id is wrong"))
+		logrus.WithError(err).Error("Error while parsing user id")
+		return err
+	}
+
+	chatID, err := strconv.ParseUint(c.QueryParam("chatID"), 10, 0)
+	if err != nil {
+		ws.WriteMessage(websocket.TextMessage, []byte("Chat id is wrong"))
+		logrus.WithError(err).Error("Invalid chat ID")
+		return err
+	}
+
+	for {
+		var incomingMessage struct {
+			Content string `json:"content"`
+			Stat    string `json:"stat"`
+		}
+		if err := ws.ReadJSON(&incomingMessage); err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				logrus.WithError(err).Error("WebSocket unexpected close error")
+			} else {
+				logrus.WithError(err).Error("WebSocket read error")
+			}
+			return err
+		}
+
+		if incomingMessage.Stat == "exit" {
+			break
+		}
+
+		chat, err := database.GetDirectChatByID(uint(chatID))
+		if err != nil {
+			if errors.Is(err, database.NotFoundChat) {
+				ws.WriteMessage(websocket.TextMessage, []byte("This chat does not exist"))
+				continue
+			}
+			ws.WriteMessage(websocket.TextMessage, []byte("Error while retrieving chat"))
+			logrus.WithError(err).Error("Error while get chat")
+			return err
+		}
+
+		if chat.SenderID != uint(senderIDInt) && chat.ReceiverID != uint(senderIDInt) {
+			ws.WriteMessage(websocket.TextMessage, []byte("Cannot access this chat"))
+			continue
+		}
+
+		if incomingMessage.Content == "" {
+			ws.WriteMessage(websocket.TextMessage, []byte("Message content cannot be empty"))
+			continue
+		}
+
+		_, err = database.CreateMessage(uint(chatID), model.TypeDirectChat, incomingMessage.Content)
+		if err != nil {
+			ws.WriteMessage(websocket.TextMessage, []byte("Can not create message"))
+			logrus.WithError(err).Error("Error while creating message")
+			return err
+		}
+
+		ws.WriteMessage(websocket.TextMessage, []byte("Message sent"))
+	}
+
+	return nil
+}
+func GetMessageByCountWs(c echo.Context) error {
+	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to upgrade to WebSocket")
+		return err
+	}
+	defer ws.Close()
+
+	receiverID := c.Get("id").(string)
+	receiverIDInt, err := strconv.ParseUint(receiverID, 10, 0)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to validate JWT")
+		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
+		return echo.ErrUnauthorized
+	}
+
+	chatID, err := strconv.ParseUint(c.QueryParam("chatID"), 10, 0)
+	if err != nil {
+		logrus.WithError(err).Error("Invalid chat ID")
+		ws.WriteMessage(websocket.TextMessage, []byte("Invalid chat ID"))
+		return echo.ErrBadRequest
+	}
+
+	for {
+		var requestData struct {
+			Count uint   `json:"count"`
+			Stat  string `json:"stat"`
+		}
+
+		if err := ws.ReadJSON(&requestData); err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				logrus.WithError(err).Error("WebSocket unexpected close error")
+				return err
+			}
+			logrus.WithError(err).Error("WebSocket read error")
+			break
+		}
+
+		if requestData.Stat == "exit" {
+			break
+		}
+
+		chat, err := database.GetDirectChatByID(uint(chatID))
+		if err != nil {
+			logrus.WithError(err).Error("Error while retrieving chat")
+			ws.WriteMessage(websocket.TextMessage, []byte("Error while retrieving chat"))
+			return echo.ErrInternalServerError
+		}
+
+		if chat == nil || (chat.SenderID != uint(receiverIDInt) && chat.ReceiverID != uint(receiverIDInt)) {
+			ws.WriteMessage(websocket.TextMessage, []byte("Cannot access this chat"))
+			continue
+		}
+
+		messages, err := database.GetMessagesByChatID(uint(chatID), model.TypeDirectChat)
+		if err != nil {
+			logrus.WithError(err).Error("Error while retrieving messages")
+			ws.WriteMessage(websocket.TextMessage, []byte("Error while retrieving messages"))
+			return echo.ErrInternalServerError
+		}
+
+		sort.Slice(messages, func(i, j int) bool {
+			return messages[i].CreatedAt.After(messages[j].CreatedAt)
+		})
+		count := requestData.Count
+		if count > uint(len(messages)) {
+			count = uint(len(messages))
+		}
+
+		if err := ws.WriteJSON(messages[:count]); err != nil {
+			logrus.WithError(err).Error("Failed to write messages to WebSocket")
+			return err
+		}
+	}
+
+	return nil
 }
