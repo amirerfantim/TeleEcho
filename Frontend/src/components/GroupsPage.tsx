@@ -118,24 +118,34 @@ const GroupsPage: React.FC = () => {
             const response = await fetch('http://127.0.0.1:8020/group', {
                 method: 'POST',
                 headers: {
-                    'Authorization': '' + localStorage.getItem('token'), // Replace with your auth token
+                    'Authorization': '' + localStorage.getItem('token'),
                 },
                 body: formData,
             });
 
             setShowAddGroupModal(false);
+
+
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                const errorText = await response.text();
+                throw new Error(errorText || 'Failed to create the group');
             }
+
             await response.json();
+            setResponseMessage('Group created successfully.');
             setNewGroupName('');
             setNewGroupDescription('');
             setGroupProfilePicture(null);
             fetchGroups(); // Refresh the groups list
         } catch (error) {
-            console.error('Failed to create the group:', error);
+            if (error instanceof Error) {
+                setResponseMessage(error.message);
+            } else {
+                setResponseMessage('An unexpected error occurred');
+            }
         }
     };
+
 
 
     const handleDeleteGroup = async (groupId: number) => {
