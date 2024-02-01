@@ -96,7 +96,7 @@ func AddUserToGroup(c echo.Context) error {
 	return c.JSON(http.StatusCreated, "User added to the group successfully.")
 }
 func GetUserGroups(c echo.Context) error {
-	groupName := c.FormValue("name")
+	groupName := c.QueryParam("name")
 	userID := c.Get("id").(string)
 	userIDInt, err := strconv.ParseUint(userID, 10, 0)
 	if err != nil {
@@ -227,4 +227,23 @@ func RemoveUserGroup(c echo.Context) error {
 		return c.JSON(http.StatusCreated, "The group deleted successfully.")
 	}
 
+}
+func GetAllUsersInGroup(c echo.Context) error {
+	groupIDParam := c.QueryParam("groupID")
+	groupID, err := strconv.ParseUint(groupIDParam, 10, 32)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"groupID": groupIDParam,
+			"error":   err,
+		}).Error("Invalid group ID")
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid group ID")
+	}
+
+	users, err := database.GetAllUsersInGroup(uint(groupID))
+	if err != nil {
+		logrus.Printf("Error while retriving users of a group")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve users")
+	}
+
+	return c.JSON(http.StatusOK, users)
 }

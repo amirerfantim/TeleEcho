@@ -141,3 +141,21 @@ func RemoveUserFromGroup(userID, groupID uint) error {
 	}).Info("User removed from group successfully")
 	return nil
 }
+func GetAllUsersInGroup(groupID uint) ([]model.User, error) {
+	var users []model.User
+	err := DB.Table("user_groups").
+		Select("users.*").
+		Joins("join users on users.id = user_groups.user_id").
+		Where("user_groups.group_id = ?", groupID).
+		Scan(&users).Error
+
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"groupID": groupID,
+			"error":   err,
+		}).Error("Failed to retrieve users from group")
+		return nil, err
+	}
+
+	return users, nil
+}
