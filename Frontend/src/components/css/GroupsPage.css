@@ -40,3 +40,26 @@
     left: 20px;
     /* Style your navigation button */
 }
+
+.add-user-group-button {
+    background-color: transparent;
+    border-radius: 50%; /* Ensure circular shape */
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 5px; /* Remove padding */
+}
+
+.add-user-group-button:hover {
+    background-color: #89cff0;
+}
+
+.group-card-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

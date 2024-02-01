@@ -5,12 +5,22 @@ import profileIcon from "../assets/profile.png";
 import groupIcon from "../assets/group.png";
 import contactIcon from "../assets/contact.png";
 import deleteIcon from "../assets/delete_icon.png";
+import addUserIcon from "../assets/add.png";
+
 
 interface Group {
     id: number;
     name: string;
     description: string;
     profilePicture: string;
+}
+
+interface Contact {
+    id: number;
+    username: string;
+    firstname: string;
+    lastname: string;
+    phone: string;
 }
 
 const GroupsPage: React.FC = () => {
@@ -20,6 +30,10 @@ const GroupsPage: React.FC = () => {
     const [newGroupDescription, setNewGroupDescription] = useState('');
     const [groupProfilePicture, setGroupProfilePicture] = useState<File | null>(null);
     const navigate = useNavigate();
+    const [contacts, setContacts] = useState<Contact[]>([]);
+    const [showAddUsersModal, setShowAddUsersModal] = useState(false);
+    const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
+    const [error, setError] = useState('');
 
     const fetchGroups = async () => {
         try {
@@ -55,6 +69,36 @@ const GroupsPage: React.FC = () => {
         if (e.target.files && e.target.files[0]) {
             setGroupProfilePicture(e.target.files[0]);
         }
+    };
+
+    const fetchContacts = () => {
+        fetch('http://127.0.0.1:8020/contacts', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': '' + localStorage.getItem('token'),
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setContacts(data);
+                } else {
+                    setError('The contact list is empty');
+                }
+            })
+            .catch(error => setError(error.message));
+    };
+
+    const openAddUsersModal = (groupId: number) => {
+        setSelectedGroupId(groupId);
+        setShowAddUsersModal(true);
+        fetchContacts();
     };
 
     const handleCreateGroup = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -120,6 +164,35 @@ const GroupsPage: React.FC = () => {
         }
     };
 
+    const handleAddUsersToGroup = (username: string) => {
+        if (selectedGroupId) {
+            const formData = new FormData();
+            formData.append('groupID', selectedGroupId.toString());
+            formData.append('username', username);
+
+            fetch(`http://127.0.0.1:8020/group`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': '' + localStorage.getItem('token'),
+                    // 'Content-Type': 'multipart/form-data' is not needed, browser sets it along with the correct boundary
+                },
+                body: formData,
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to add user to group');
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    setShowAddUsersModal(false);
+                    fetchGroups();
+                })
+                .catch(error => setError(error.message));
+        }
+    };
+
+
 
     const navigateToGroup = (groupId: number) => {
         navigate(`/group/${groupId}`);
@@ -134,17 +207,26 @@ const GroupsPage: React.FC = () => {
                 <img src={contactIcon} alt="Groups"/>
             </button>
             <button className="add-button-first" onClick={() => setShowAddGroupModal(true)}>+</button>
+
             <div className="groups-container">
                 {groups.map(group => (
                     <div key={group.id} className="group-card" onClick={() => navigateToGroup(group.id)}>
                         <h3>{group.name}</h3>
                         <p>{group.description}</p>
-                        <button className="delete-button" onClick={(e) => {
-                            e.stopPropagation(); // Prevents navigating to the group detail page
-                            handleDeleteGroup(group.id);
-                        }}>
-                            <img src={deleteIcon} alt="Delete"/>
-                        </button>
+                        <div className="group-card-actions">
+                            <button className="delete-button" onClick={(e) => {
+                                e.stopPropagation(); // Prevents navigating to the group detail page
+                                handleDeleteGroup(group.id);
+                            }}>
+                                <img src={deleteIcon} alt="Delete"/>
+                            </button>
+                            <button className="add-user-group-button" onClick={(e) => {
+                                e.stopPropagation(); // Prevent navigating to group detail
+                                openAddUsersModal(group.id);
+                            }}>
+                                <img src={addUserIcon} alt="Add User"/>
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -182,6 +264,23 @@ const GroupsPage: React.FC = () => {
                             />
                             <button type="submit">Create Group</button>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {showAddUsersModal && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <span className="close-button" onClick={() => setShowAddUsersModal(false)}>&times;</span>
+                        <h2>Add Users to Group</h2>
+                        <div>
+                            {contacts.map(contact => (
+                                <div key={contact.id} className="contact-card">
+                                    <div>{contact.firstname} {contact.lastname}</div>
+                                    <button onClick={() => handleAddUsersToGroup(contact.username)}>Add to Group</button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
