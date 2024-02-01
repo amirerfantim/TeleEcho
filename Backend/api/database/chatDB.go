@@ -83,3 +83,40 @@ func DoesGroupChatExist(groupID uint) (bool, error) {
 
 	return true, nil
 }
+func DeleteDirectChatAndMessages(chatID uint) error {
+	tx := DB.Begin()
+	if err := tx.Where("chat_id = ? AND type = ?", chatID, model.TypeDirectChat).Delete(&model.Message{}).Error; err != nil {
+		logrus.WithError(err).WithField("chatID", chatID).Error("Failed to delete direct chat messages")
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Where("id = ?", chatID).Delete(&model.DirectChat{}).Error; err != nil {
+		logrus.WithError(err).WithField("chatID", chatID).Error("Failed to delete direct chat")
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	logrus.Println("Direct chat with id %d with all messages deleted successfully.", chatID)
+	return nil
+}
+
+func DeleteGroupChatAndMessages(chatID uint) error {
+	tx := DB.Begin()
+	if err := tx.Where("chat_id = ? AND type = ?", chatID, model.TypeGroupChat).Delete(&model.Message{}).Error; err != nil {
+		logrus.WithError(err).WithField("chatID", chatID).Error("Failed to delete group chat messages")
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Where("id = ?", chatID).Delete(&model.GroupChat{}).Error; err != nil {
+		logrus.WithError(err).WithField("chatID", chatID).Error("Failed to delete group chat")
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	logrus.Println("Group chat with id %d with all messages deleted successfully.", chatID)
+	return nil
+}

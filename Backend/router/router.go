@@ -35,6 +35,14 @@ func New() *echo.Echo {
 	groupHandlersGroup.GET("", handlers.GetUserGroups)
 	groupHandlersGroup.PATCH("", handlers.AddUserToGroup)
 	groupHandlersGroup.DELETE("", handlers.RemoveUserGroup)
+	groupHandlersGroup.GET("/all", handlers.GetAllUsersInGroup)
+
+	groupChatHandlersGroup := e.Group("/group-chat", myMiddleware.ValidateJWT)
+	groupChatHandlersGroup.POST("", handlers.CreateGroupChat)
+	groupChatHandlersGroup.DELETE("", handlers.DeleteGroupChatHandler)
+	directChatHandlersGroup := e.Group("/chat", myMiddleware.ValidateJWT)
+	directChatHandlersGroup.POST("", handlers.CreateDirectChat)
+	directChatHandlersGroup.DELETE("", handlers.DeleteDirectChatHandler)
 
 	return e
 }
