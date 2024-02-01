@@ -45,6 +45,8 @@ func New() *echo.Echo {
 	directChatHandlersGroup.POST("", handlers.CreateDirectChat)
 	directChatHandlersGroup.DELETE("", handlers.DeleteDirectChatHandler)
 	directChatHandlersGroup.GET("", handlers.GetDirectChatMessagesHandler)
+	directChatHandlersGroup.GET("/write-message", handlers.NewChatMessageWs)
+	directChatHandlersGroup.GET("/read-message", handlers.GetMessageByCountWs)
 
 	return e
 }

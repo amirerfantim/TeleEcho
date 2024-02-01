@@ -132,3 +132,27 @@ func GetMessagesByChatID(chatID uint, chatType model.ChatType) ([]model.Message,
 	}
 	return messages, nil
 }
+func GetGroupChatByID(chatID uint) (*model.GroupChat, error) {
+	var chat model.GroupChat
+	if err := DB.First(&chat, chatID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			logrus.WithField("chatID", chatID).Info("Group chat not found")
+			return nil, NotFoundChat
+		}
+		logrus.WithError(err).WithField("chatID", chatID).Error("Failed to retrieve group chat")
+		return nil, err
+	}
+	return &chat, nil
+}
+func GetDirectChatByID(chatID uint) (*model.DirectChat, error) {
+	var chat model.DirectChat
+	if err := DB.First(&chat, chatID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			logrus.WithField("chatID", chatID).Info("Direct chat not found")
+			return nil, NotFoundChat
+		}
+		logrus.WithError(err).WithField("chatID", chatID).Error("Failed to retrieve direct chat")
+		return nil, err
+	}
+	return &chat, nil
+}
