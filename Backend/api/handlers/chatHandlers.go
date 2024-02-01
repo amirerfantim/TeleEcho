@@ -128,7 +128,7 @@ func NewChatMessageWs(c echo.Context) error {
 		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
 		return echo.ErrUnauthorized
 	}
-	
+
 	chatID, err := strconv.ParseUint(c.QueryParam("chatID"), 10, 0)
 	if err != nil {
 		ws.WriteMessage(websocket.TextMessage, []byte("Chat id is wrong"))
@@ -393,4 +393,19 @@ func GetGroupChatMessagesHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, messages)
+}
+func DeleteMessageHandler(c echo.Context) error {
+	messageIDParam := c.QueryParam("id")
+	messageID, err := strconv.ParseUint(messageIDParam, 10, 0)
+	if err != nil {
+		logrus.WithError(err).Error("Invalid message ID")
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid message ID"})
+	}
+	err = database.DeleteMessageByID(uint(messageID))
+	if err != nil {
+		logrus.WithError(err).Error("Failed to delete message")
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to delete message"})
+	}
+
+	return c.JSON(http.StatusNoContent, map[string]string{"message": "Message successfully deleted"})
 }

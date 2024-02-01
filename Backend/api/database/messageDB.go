@@ -38,3 +38,25 @@ func GetMessagesByChatIDAndType(chatID uint, chatType model.ChatType) ([]model.M
 	}
 	return messages, nil
 }
+
+func DeleteMessageByID(messageID uint) error {
+	result := DB.Delete(&model.Message{}, messageID)
+	if err := result.Error; err != nil {
+		logrus.WithFields(logrus.Fields{
+			"messageID": messageID,
+		}).WithError(err).Error("Failed to delete message")
+		return err
+	}
+
+	if result.RowsAffected == 0 {
+		logrus.WithFields(logrus.Fields{
+			"messageID": messageID,
+		}).Info("No message found with the given ID to delete")
+	} else {
+		logrus.WithFields(logrus.Fields{
+			"messageID": messageID,
+		}).Info("Message successfully deleted")
+	}
+
+	return nil
+}
