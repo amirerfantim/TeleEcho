@@ -3,7 +3,9 @@ package handlers
 import (
 	"TeleEcho/api/database"
 	"TeleEcho/model"
+	"errors"
 	"fmt"
+	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -78,114 +80,63 @@ func CreateGroupChat(c echo.Context) error {
 	}
 }
 
-//func GetGroupDataWs(c echo.Context) error {
-//	groupID, err := strconv.ParseUint(c.Param("groupid"), 10, 64)
-//	if err != nil {
-//		return echo.ErrBadRequest
-//	}
-//
-//	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
-//	if err != nil {
-//		return err
-//	}
-//	defer ws.Close()
-//
-//	for {
-//		var requestData struct {
-//			Stat string `json:"stat"`
-//		}
-//
-//		err = ws.ReadJSON(&requestData)
-//		if err != nil {
-//			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-//				return err
-//			}
-//			break
-//		}
-//
-//		if requestData.Stat == "exit" {
-//			break
-//		}
-//
-//		groupID := groupID
-//
-//		group, users, err := g.userGroupRepo.GetGroupWithUserGroups(c.Request().Context(), groupID)
-//		if err != nil {
-//			return echo.ErrInternalServerError
-//		}
-//
-//		if len(group) == 0 {
-//			ws.WriteMessage(websocket.TextMessage, []byte("No groups found"))
-//			continue
-//		}
-//
-//		err = ws.WriteJSON(echo.Map{
-//			"group": group,
-//			"users": users,
-//		})
-//		if err != nil {
-//			return err
-//		}
-//	}
-//
-//	return nil
-//}
-//func GetGroupChatWs(c echo.Context) error {
-//	groupID, err := strconv.ParseUint(c.Param("group_id"), 10, 0)
-//	if err != nil {
-//		logrus.WithError(err).Error("Failed to parse group ID")
-//		return echo.ErrBadRequest
-//	}
-//
-//	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
-//	if err != nil {
-//		logrus.WithError(err).Error("Failed to upgrade WebSocket connection")
-//		return err
-//	}
-//	defer ws.Close()
-//
-//	for {
-//		var requestData struct {
-//			Stat string `json:"stat"`
-//		}
-//
-//		err = ws.ReadJSON(&requestData)
-//		if err != nil {
-//			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-//				logrus.WithError(err).Error("Unexpected WebSocket close error")
-//				return err
-//			}
-//			break
-//		}
-//
-//		if requestData.Stat == "exit" {
-//			break
-//		}
-//		users, err := database.GetAllUsersInGroup(uint(groupID))
-//		group, users, err := g.userGroupRepo.GetGroupWithUserGroups(c.Request().Context(), groupID)
-//		if err != nil {
-//			logrus.WithError(err).Error("Failed to fetch group data from the repository")
-//			return echo.ErrInternalServerError
-//		}
-//
-//		if len(group) == 0 {
-//			err := ws.WriteMessage(websocket.TextMessage, []byte("No groups found"))
-//			if err != nil {
-//				logrus.WithError(err).Error("Failed to send 'No groups found' message over WebSocket")
-//				return err
-//			}
-//			continue
-//		}
-//
-//		err = ws.WriteJSON(echo.Map{
-//			"group": group,
-//			"users": users,
-//		})
-//		if err != nil {
-//			logrus.WithError(err).Error("Failed to send group data over WebSocket")
-//			return err
-//		}
-//	}
-//
-//	return nil
-//}
+func GetGroupChatWs(c echo.Context) error {
+	groupID, err := strconv.ParseUint(c.QueryParam("groupID"), 10, 0)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to parse group ID")
+		return echo.ErrBadRequest
+	}
+
+	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to upgrade WebSocket connection")
+		return err
+	}
+	defer ws.Close()
+
+	for {
+		var requestData struct {
+			Stat string `json:"stat"`
+		}
+
+		err = ws.ReadJSON(&requestData)
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				logrus.WithError(err).Error("Unexpected WebSocket close error")
+				return err
+			}
+			return echo.ErrInternalServerError
+		}
+
+		if requestData.Stat == "exit" {
+			break
+		}
+		group, err := database.GetGroupByID(uint(groupID))
+		if err != nil {
+			if errors.Is(err, database.NotFoundGroup) {
+				err := ws.WriteMessage(websocket.TextMessage, []byte("No groups found"))
+				if err != nil {
+					logrus.WithError(err).Error("Failed to send 'No groups found' message over WebSocket")
+					return err
+				}
+				continue
+			}
+			return echo.ErrInternalServerError
+		}
+		users, err := database.GetAllUsersInGroup(uint(groupID))
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
+
+		err = ws.WriteJSON(echo.Map{
+			"group": group,
+			"users": users,
+		})
+		if err != nil {
+			logrus.WithError(err).Error("Failed to send group data over WebSocket")
+			return err
+		}
+	}
+
+	return nil
+}

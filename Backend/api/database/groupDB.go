@@ -160,18 +160,18 @@ func GetAllUsersInGroup(groupID uint) ([]model.User, error) {
 	return users, nil
 }
 
-//func GetGroupByID(id uint) (*model.Group, error) {
-//	var group model.Group
-//
-//	if err := DB.First(&group, id).Error; err != nil {
-//		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-//			logrus.WithError(err).Warnf("Group with ID %d not found", id)
-//			return nil, nil // Return nil for the group and nil error when the record is not found
-//		}
-//
-//		logrus.WithError(err).Error("Failed to fetch group by ID")
-//		return nil, err
-//	}
-//
-//	return &group, nil
-//}
+func GetGroupByID(id uint) (*model.Group, error) {
+	var group model.Group
+
+	if err := DB.First(&group, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			logrus.WithError(err).Warnf("Group with ID %d not found", id)
+			return nil, NotFoundGroup
+		}
+
+		logrus.WithError(err).Error("Failed to fetch group by ID")
+		return nil, err
+	}
+
+	return &group, nil
+}

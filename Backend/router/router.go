@@ -52,5 +52,7 @@ func New() *echo.Echo {
 	e.GET("/write-message", handlers.NewChatMessageWs)
 	e.GET("/read-message", handlers.GetMessageByCountWs)
 
+	e.GET("/all-group-chat", handlers.GetGroupChatWs)
+
 	return e
 }
