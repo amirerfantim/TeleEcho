@@ -264,3 +264,134 @@ func GetMessageByCountWs(c echo.Context) error {
 
 	return nil
 }
+func GetDirectChatsWs(c echo.Context) error {
+	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to upgrade to WebSocket")
+		return err
+	}
+	defer ws.Close()
+
+	userID := c.Get("id").(string)
+	userIDInt, err := strconv.ParseUint(userID, 10, 0)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to validate JWT")
+		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
+		return echo.ErrUnauthorized
+	}
+	sendUpdatedChats := func() error {
+
+		receiverChats, err := database.GetChatsByReceiverID(uint(userIDInt))
+		if err != nil {
+			logrus.WithError(err).Error("Failed to retrieve receiver chats")
+			return echo.ErrInternalServerError
+		}
+		senderChats, err := database.GetChatsBySenderID(uint(userIDInt))
+		if err != nil {
+			logrus.WithError(err).Error("Failed to retrieve sender chats")
+			return echo.ErrInternalServerError
+		}
+
+		allChats := append(senderChats, receiverChats...)
+
+		senderUsers, err := database.GetUsersForChatsByReceiverID(uint(userIDInt))
+
+		if err != nil {
+			logrus.WithError(err).Error("Failed to retrieve sender chat users")
+			return echo.ErrInternalServerError
+		}
+		type response struct {
+			User          model.User `json:"user"`
+			UnreadMessage int        `json:"unreadMessage"`
+		}
+
+		if len(allChats) == 0 {
+			return nil
+		}
+
+		res := make([]response, len(receiverChats))
+		countNumber := 0
+		for _, chat := range receiverChats {
+			count, err := database.CountUnreadMessages(chat.ID, model.TypeDirectChat)
+			if err != nil {
+				logrus.WithError(err).Error("Failed to count unread messages")
+				return echo.ErrInternalServerError
+			}
+			for _, user := range senderUsers {
+				if user.ID == chat.SenderID {
+					res[countNumber] = response{
+						User:          user,
+						UnreadMessage: int(count),
+					}
+					countNumber++
+					break
+				}
+			}
+		}
+
+		return ws.WriteJSON(res)
+	}
+
+	for {
+		err = sendUpdatedChats()
+		if err != nil {
+			return err
+		}
+
+		type msg struct {
+			Message string `json:"message"`
+		}
+		var m msg
+		err = ws.ReadJSON(&m)
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				logrus.WithError(err).Error("WebSocket unexpected close error")
+				return err
+			}
+			break
+		}
+
+		if m.Message == "new" {
+			err = sendUpdatedChats()
+			if err != nil {
+				return err
+			}
+		}
+		if m.Message == "exit" {
+			break
+		}
+	}
+
+	return nil
+}
+func GetDirectChatMessagesHandler(c echo.Context) error {
+	chatIDParam := c.QueryParam("chatID")
+	chatID, err := strconv.ParseUint(chatIDParam, 10, 0)
+	if err != nil {
+		logrus.WithError(err).WithField("chatID", chatIDParam).Error("Invalid chat ID")
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid chat ID")
+	}
+
+	messages, err := database.GetMessagesByChatID(uint(chatID), model.TypeDirectChat)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve messages")
+	}
+
+	return c.JSON(http.StatusOK, messages)
+}
+func GetGroupChatMessagesHandler(c echo.Context) error {
+	chatIDParam := c.QueryParam("chatID")
+	chatID, err := strconv.ParseUint(chatIDParam, 10, 0)
+	if err != nil {
+		logrus.WithError(err).WithField("chatID", chatIDParam).Error("Invalid chat ID")
+		return c.JSON(http.StatusBadRequest, "Invalid chat ID")
+	}
+
+	messages, err := database.GetMessagesByChatID(uint(chatID), model.TypeGroupChat)
+	if err != nil {
+		logrus.Printf("Can not rerive messages: %e\n", err)
+		return c.JSON(http.StatusInternalServerError, "Failed to retrieve messages")
+	}
+
+	return c.JSON(http.StatusOK, messages)
+}

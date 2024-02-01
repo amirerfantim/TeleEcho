@@ -156,3 +156,76 @@ func GetDirectChatByID(chatID uint) (*model.DirectChat, error) {
 	}
 	return &chat, nil
 }
+
+func GetChatsBySenderID(senderID uint) ([]model.DirectChat, error) {
+	var chats []model.DirectChat
+	err := DB.Where("sender_id = ?", senderID).Find(&chats).Error
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"senderID": senderID,
+		}).WithError(err).Error("Failed to retrieve chats for sender")
+		return nil, err
+	}
+	return chats, nil
+}
+func GetChatsByReceiverID(receiverID uint) ([]model.DirectChat, error) {
+	var chats []model.DirectChat
+	err := DB.Where("receiver_id = ?", receiverID).Find(&chats).Error
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"receiverID": receiverID,
+		}).WithError(err).Error("Failed to retrieve chats for receiver")
+		return nil, err
+	}
+	return chats, nil
+}
+func GetUsersForChatsBySenderID(senderID uint) ([]model.User, error) {
+	var users []model.User
+	err := DB.Table("direct_chats").
+		Select("users.*").
+		Joins("join users on users.id = direct_chats.receiver_id").
+		Where("direct_chats.sender_id = ?", senderID).
+		Find(&users).Error
+
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"senderID": senderID,
+		}).WithError(err).Error("Failed to retrieve users for chats by sender")
+		return nil, err
+	}
+	return users, nil
+}
+func GetUsersForChatsByReceiverID(receiverID uint) ([]model.User, error) {
+	var users []model.User
+	err := DB.Table("direct_chats").
+		Select("users.*").
+		Joins("join users on users.id = direct_chats.sender_id").
+		Where("direct_chats.receiver_id = ?", receiverID).
+		Find(&users).Error
+
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"receiverID": receiverID,
+		}).WithError(err).Error("Failed to retrieve users for chats by receiver")
+		return nil, err
+	}
+	return users, nil
+}
+func CountUnreadMessages(chatID uint, chatType model.ChatType) (int64, error) {
+	var count int64
+	criteria := &model.Message{
+		ChatID: chatID,
+		Type:   chatType,
+		IsRead: false,
+	}
+	if err := DB.Model(&model.Message{}).Where(criteria).Count(&count).Error; err != nil {
+		logrus.WithFields(logrus.Fields{
+			"ChatID": chatID,
+			"Type":   chatType,
+			"Error":  err.Error(),
+		}).Error("Failed to count unread messages")
+		return 0, err
+	}
+
+	return count, nil
+}

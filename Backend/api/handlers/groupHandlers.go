@@ -247,34 +247,3 @@ func GetAllUsersInGroup(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, users)
 }
-func GetDirectChatMessagesHandler(c echo.Context) error {
-	chatIDParam := c.QueryParam("chatID")
-	chatID, err := strconv.ParseUint(chatIDParam, 10, 0)
-	if err != nil {
-		logrus.WithError(err).WithField("chatID", chatIDParam).Error("Invalid chat ID")
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid chat ID")
-	}
-
-	messages, err := database.GetMessagesByChatID(uint(chatID), model.TypeDirectChat)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve messages")
-	}
-
-	return c.JSON(http.StatusOK, messages)
-}
-func GetGroupChatMessagesHandler(c echo.Context) error {
-	chatIDParam := c.QueryParam("chatID")
-	chatID, err := strconv.ParseUint(chatIDParam, 10, 0)
-	if err != nil {
-		logrus.WithError(err).WithField("chatID", chatIDParam).Error("Invalid chat ID")
-		return c.JSON(http.StatusBadRequest, "Invalid chat ID")
-	}
-
-	messages, err := database.GetMessagesByChatID(uint(chatID), model.TypeGroupChat)
-	if err != nil {
-		logrus.Printf("Can not rerive messages: %e\n", err)
-		return c.JSON(http.StatusInternalServerError, "Failed to retrieve messages")
-	}
-
-	return c.JSON(http.StatusOK, messages)
-}
