@@ -120,3 +120,15 @@ func DeleteGroupChatAndMessages(chatID uint) error {
 	logrus.Println("Group chat with id %d with all messages deleted successfully.", chatID)
 	return nil
 }
+func GetMessagesByChatID(chatID uint, chatType model.ChatType) ([]model.Message, error) {
+	var messages []model.Message
+	err := DB.Where("chat_id = ? AND type = ?", chatID, chatType).Find(&messages).Error
+	if err != nil {
+		logrus.WithError(err).WithFields(logrus.Fields{
+			"chatID": chatID,
+			"type":   chatType,
+		}).Error("Failed to retrieve messages")
+		return nil, err
+	}
+	return messages, nil
+}
