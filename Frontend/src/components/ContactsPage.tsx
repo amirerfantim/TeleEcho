@@ -4,7 +4,8 @@ import {useNavigate} from 'react-router-dom'; // Import useHistory from react-ro
 import deleteIcon from '../assets/delete_icon.png';
 import profileIcon from '../assets/profile.png'; // Import your profile icon
 import groupIcon from '../assets/group.png';
-import {getToken} from "./AuthHelper"; // Import your profile icon
+import {getToken} from "./AuthHelper";
+import chatIcon from "../assets/chat.png"; // Import your profile icon
 
 
 interface Contact {
@@ -217,7 +218,8 @@ const ContactsPage = () => {
                             <div className="name">{contact.firstname} {contact.lastname}</div>
                             <div className="details">@{contact.username} | {contact.phone}</div>
                         </div>
-                        <button onClick={(e) => deleteContact({event: e, username: contact.username})} className="delete-button">
+                        <button onClick={(e) => deleteContact({event: e, username: contact.username})}
+                                className="delete-button">
                             <img src={deleteIcon} alt="Delete"/>
                         </button>
                     </li>
@@ -230,6 +232,9 @@ const ContactsPage = () => {
             </button>
             <button className="navigate-second" onClick={navigateToGroups}>
                 <img src={groupIcon} alt="Groups"/>
+            </button>
+            <button className="navigate-third" onClick={() => navigate('/chats')}>
+                <img src={chatIcon} alt="Chat"/>
             </button>
             <div className="add-contact-container">
                 <button className="add-button-first" onClick={() => setShowAddContactForm(!showAddContactForm)}>+
