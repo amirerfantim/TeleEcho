@@ -2,6 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getToken } from "./AuthHelper";
 import './css/DirectChatPage.css';
 import {useParams} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import groupIcon from "../assets/group.png"; // Adjust path as per your project structure
+import contactIcon from "../assets/contact.png";
+import profileIcon from "../assets/profile.png"; // Adjust path as per your project structure
+import chatIcon from "../assets/chat.png" ; // Adjust path as per your project structure
+
 
 interface Message {
     id: number;
@@ -17,6 +23,7 @@ const DirectChatPage: React.FC = () => {
     const [newMessage, setNewMessage] = useState('');
     const wsSend = useRef<WebSocket | null>(null);
     const wsReceive = useRef<WebSocket | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Connect to SendMessage WebSocket
@@ -80,6 +87,18 @@ const DirectChatPage: React.FC = () => {
 
     return (
         <div className="chat-page">
+            <button className="navigate-first" onClick={() => navigate('/profile')}>
+                <img src={profileIcon} alt="Profile"/>
+            </button>
+            <button className="navigate-second" onClick={() => navigate('/contacts')}>
+                <img src={contactIcon} alt="Contacts"/>
+            </button>
+            <button className="navigate-third" onClick={() => navigate('/group')}>
+                <img src={groupIcon} alt="Group"/>
+            </button>
+            <button className="navigate-fourth" onClick={() => navigate('/chats')}>
+                <img src={chatIcon} alt="chats"/>
+            </button>
             <div className="messages-container">
                 {messages.map((message) => (
                     <div key={message.id} className={`message ${message.senderId === 22 ? 'sent' : 'received'}`}>
@@ -88,7 +107,7 @@ const DirectChatPage: React.FC = () => {
                 ))}
             </div>
             <div className="message-input">
-                <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} />
+                <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)}/>
                 <button onClick={sendMessage}>Send</button>
             </div>
         </div>

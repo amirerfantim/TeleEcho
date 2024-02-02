@@ -339,3 +339,34 @@ input[type="text"] {
     transform: scale(1.3); /* Hover effect scale */
 }
 
+
+.navigate-fourth {
+    background-color: #f0f0f0; /* Adjust the color as needed */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    left: 20px; /* Adjust positioning as needed */
+    top: 170px; /* Position it below the other buttons */
+    padding: 4px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    margin-bottom: 10px;
+}
+
+.navigate-fourth img {
+    width: 70%; /* Adjust icon size */
+    height: 70%;
+    object-fit: contain;
+}
+
+.navigate-fourth:hover {
+    background-color: #ffe0a0; /* Hover effect color */
+    transform: scale(1.3); /* Hover effect scale */
+}
+
+
