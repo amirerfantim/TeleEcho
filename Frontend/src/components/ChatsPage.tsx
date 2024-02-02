@@ -27,8 +27,8 @@ const ChatsPage: React.FC = () => {
 
         ws.current.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            setChats(data);
-        };
+            const filteredData = data.filter((chat: Chat) => chat.user.username);
+            setChats(filteredData);        };
 
         ws.current.onerror = (error) => {
             console.error('WebSocket error:', error);
@@ -40,6 +40,7 @@ const ChatsPage: React.FC = () => {
     }, []);
 
     const navigateToChat = (chatID: number) => {
+        const adjustedChatID = chatID % 2 === 1 ? chatID + 1 : chatID;
         navigate(`/chat/${chatID}`);
     };
 
