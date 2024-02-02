@@ -8,6 +8,7 @@ import contactIcon from "../assets/contact.png";
 import editIcon from "../assets/edit.png";
 import deleteIcon from "../assets/delete_icon.png";
 import cancelIcon from "../assets/cancel.png";
+import chatIcon from "../assets/chat.png";
 
 
 interface User {
@@ -246,6 +247,9 @@ const Profile: React.FC = () => {
             </button>
             <button className="navigate-second" onClick={() => navigate('/contacts')}>
                 <img src={contactIcon} alt="Contacts"/>
+            </button>
+            <button className="navigate-third" onClick={() => navigate('/chats')}>
+                <img src={chatIcon} alt="Chat"/>
             </button>
             <div className="profile-picture-edit-container">
                 {user.profilePicture && (
