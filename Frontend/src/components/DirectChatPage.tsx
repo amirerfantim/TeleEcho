@@ -251,6 +251,7 @@ const DirectChatPage: React.FC = () => {
 
     return (
         <div className="chat-page">
+            <span className="online-indicator">Online!</span>
             <button className="navigate-first" onClick={() => navigate('/profile')}>
                 <img src={profileIcon} alt="Profile"/>
             </button>
@@ -261,27 +262,19 @@ const DirectChatPage: React.FC = () => {
                 <img src={groupIcon} alt="Group"/>
             </button>
             <button className="navigate-fourth" onClick={() => navigate('/chats')}>
-                <img src={chatIcon} alt="chats"/>
-            </button>
-            <button className="add-button-second" onClick={deleteChat}>
-                <img src={deleteIcon} alt="Profile"/>
+                <img src={chatIcon} alt="Chats"/>
             </button>
             <div className="messages-container">
-                {messages.map((message) => {
-                    // console.log(`Message ID: ${message.id}, Sender ID: ${message.senderId}, Current User ID: ${currentUserId}`);
-
-                    return (
-                        <div key={message.id}
-                             className={`message ${message.senderId === currentUserId ? 'sent' : 'received'}`}>
-                            {message.content}
-                            <button onClick={() => handleCopyMessage(message.content)}>+</button>
-                        </div>
-                    );
-                })}
+                {messages.map((message) => (
+                    <div key={message.id} className={`message ${message.senderId === currentUserId ? 'sent' : 'received'}`}>
+                        {message.content}
+                        <button className="copy-message-btn" onClick={() => handleCopyMessage(message.content)}>+</button>
+                    </div>
+                ))}
             </div>
 
             <div className="message-input">
-                <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)}/>
+                <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} />
                 <button onClick={sendMessage}>Send</button>
             </div>
 
@@ -292,7 +285,6 @@ const DirectChatPage: React.FC = () => {
                     onChatSelect={(chatID) => handleSendCopiedMessage({chatID: chatID})}
                 />
             )}
-
         </div>
     );
 };

@@ -44,3 +44,43 @@
     padding: 10px 20px;
     cursor: pointer;
 }
+
+/* Online indicator styles */
+.online-indicator {
+    margin-left: 8px;
+    color: wheat;
+    font-weight: bold;
+}
+
+/* Message card styles */
+.message {
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f0f0; /* Example background color */
+}
+
+/* Copy message button "+" styles */
+.copy-message-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background-color: blue;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.copy-message-btn:hover {
+    background-color: green;
+    transform: scale(1.2);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
