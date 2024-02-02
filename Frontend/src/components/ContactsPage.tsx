@@ -175,7 +175,9 @@ const ContactsPage = () => {
             });
     };
 
-    const deleteContact = (username: string) => {
+    const deleteContact = ({event, username}: { event: any, username: any }) => {
+        event.stopPropagation(); // Prevent the click from bubbling up to parent elements
+
         if (window.confirm('Are you sure you want to delete this contact?')) {
             fetch(`http://127.0.0.1:8020/contacts?username=${encodeURIComponent(username)}`, {
                 method: 'DELETE',
@@ -215,7 +217,7 @@ const ContactsPage = () => {
                             <div className="name">{contact.firstname} {contact.lastname}</div>
                             <div className="details">@{contact.username} | {contact.phone}</div>
                         </div>
-                        <button onClick={() => deleteContact(contact.username)} className="delete-button">
+                        <button onClick={(e) => deleteContact({event: e, username: contact.username})} className="delete-button">
                             <img src={deleteIcon} alt="Delete"/>
                         </button>
                     </li>
