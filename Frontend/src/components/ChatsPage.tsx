@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import './css/ChatsPage.css';
-import {getToken} from "./AuthHelper"; // Ensure you have the CSS similar to ContactsPage.css
+// import './css/ChatsPage.css'; // Ensure to uncomment or ensure you have similar CSS
+import { getToken } from "./AuthHelper"; // Ensure you have the CSS similar to ContactsPage.css
+import groupIcon from "../assets/group.png"; // Adjust the path as per your project structure
+import contactIcon from "../assets/contact.png"; // Adjust the path as per your project structure
+import profileIcon from "../assets/profile.png"; // Adjust the path as per your project structure
 
-// Assuming the chat model includes these fields
 interface Chat {
     chatID: number;
     user: {
@@ -38,12 +40,23 @@ const ChatsPage: React.FC = () => {
     }, []);
 
     const navigateToChat = (chatID: number) => {
-        const adjustedChatID = chatID % 2 === 1 ? chatID + 1 : chatID;
-        navigate(`/chat/${adjustedChatID}`);
+        navigate(`/chat/${chatID}`);
     };
 
     return (
         <div className="centered-container">
+            {/* Navigation buttons */}
+
+            <button className="navigate-first" onClick={() => navigate('/profile')}>
+                <img src={profileIcon} alt="Profile"/>
+            </button>
+            <button className="navigate-second" onClick={() => navigate('/contacts')}>
+                <img src={contactIcon} alt="Contacts"/>
+            </button>
+            <button className="navigate-third" onClick={() => navigate('/group')}>
+                <img src={groupIcon} alt="Group"/>
+            </button>
+            {/* Chats list */}
             <ul className="contacts-container">
                 {chats.map((chat) => (
                     <li key={chat.chatID} className="contact-card" onClick={() => navigateToChat(chat.chatID)}>
