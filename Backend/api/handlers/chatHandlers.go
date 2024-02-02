@@ -20,6 +20,34 @@ var upgrader = websocket.Upgrader{
 		return true
 	},
 }
+
+type TypingStatus struct {
+	Users map[uint]bool
+	mu    sync.Mutex
+}
+
+func NewTypingStatus() *TypingStatus {
+	return &TypingStatus{
+		Users: make(map[uint]bool),
+	}
+}
+func (ts *TypingStatus) SetTyping(userID uint) {
+	ts.mu.Lock()
+	defer ts.mu.Unlock()
+	ts.Users[userID] = true
+}
+
+func (ts *TypingStatus) SetNotTyping(userID uint) {
+	ts.mu.Lock()
+	defer ts.mu.Unlock()
+	delete(ts.Users, userID)
+}
+func (ts *TypingStatus) IsTyping(userID uint) bool {
+	ts.mu.Lock()
+	defer ts.mu.Unlock()
+	return ts.Users[userID]
+}
+
 var activeUsers = make(map[uint]*websocket.Conn)
 var activeUsersMutex = &sync.Mutex{}
 
@@ -103,7 +131,7 @@ func NewChatMessageWs(c echo.Context) error {
 	}
 	participantOnline := isUserOnline(chat.ReceiverID)
 	ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Participant online: %v", participantOnline)))
-
+	typingStatus := NewTypingStatus()
 	for {
 		var incomingMessage struct {
 			Content string `json:"content"`
@@ -146,6 +174,7 @@ func NewChatMessageWs(c echo.Context) error {
 			ws.WriteMessage(websocket.TextMessage, []byte("Message content cannot be empty"))
 			continue
 		}
+		typingStatus.SetTyping(chat.ReceiverID)
 
 		_, err = database.CreateMessage(uint(chatID), model.TypeDirectChat, incomingMessage.Content)
 		if err != nil {
@@ -154,6 +183,7 @@ func NewChatMessageWs(c echo.Context) error {
 			return err
 		}
 		ws.WriteMessage(websocket.TextMessage, []byte("Message sent"))
+		typingStatus.SetNotTyping(chat.ReceiverID)
 		if chat.SenderID == uint(senderIDInt) {
 			receiverOnline := isUserOnline(chat.ReceiverID)
 			ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Receiver online: %v", receiverOnline)))
@@ -215,7 +245,7 @@ func GetMessageByCountWs(c echo.Context) error {
 		senderOnline := isUserOnline(chat.SenderID)
 		ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Sender online: %v", senderOnline)))
 	}
-
+	typingStatus := NewTypingStatus()
 	for {
 		var requestData struct {
 			Count uint   `json:"count"`
@@ -253,6 +283,9 @@ func GetMessageByCountWs(c echo.Context) error {
 		count := requestData.Count
 		if count > uint(len(messages)) {
 			count = uint(len(messages))
+		}
+		if typingStatus.IsTyping(uint(chat.SenderID)) {
+			ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("User %d is typing...", receiverIDInt)))
 		}
 
 		if err := ws.WriteJSON(messages[:count]); err != nil {

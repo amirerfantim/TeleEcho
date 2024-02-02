@@ -83,11 +83,6 @@ func CreateGroupChat(c echo.Context) error {
 }
 
 func GetGroupChatWs(c echo.Context) error {
-	groupID, err := strconv.ParseUint(c.QueryParam("groupID"), 10, 0)
-	if err != nil {
-		logrus.WithError(err).Error("Failed to parse group ID")
-		return echo.ErrBadRequest
-	}
 
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
@@ -95,6 +90,31 @@ func GetGroupChatWs(c echo.Context) error {
 		return err
 	}
 	defer ws.Close()
+	userIDInt, checkJWT := middleware.ValidateJWTToken(c.QueryParam("token"))
+	if !checkJWT {
+		logrus.WithError(err).Error("Failed to validate JWT")
+		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
+		return echo.ErrUnauthorized
+	}
+	sendUpdatedGroup := func() error {
+
+		group, err := database.GetUserGroups(uint(userIDInt))
+		if err != nil {
+			if errors.Is(err, database.NotFoundGroup) {
+				err := ws.WriteMessage(websocket.TextMessage, []byte("No groups found"))
+				if err != nil {
+					logrus.WithError(err).Error("Failed to send 'No groups found' message over WebSocket")
+					return err
+				}
+				return nil
+
+			}
+			return echo.ErrInternalServerError
+		}
+
+		return ws.WriteJSON(group)
+
+	}
 
 	for {
 		var requestData struct {
@@ -113,30 +133,11 @@ func GetGroupChatWs(c echo.Context) error {
 		if requestData.Stat == "exit" {
 			break
 		}
-		group, err := database.GetGroupByID(uint(groupID))
-		if err != nil {
-			if errors.Is(err, database.NotFoundGroup) {
-				err := ws.WriteMessage(websocket.TextMessage, []byte("No groups found"))
-				if err != nil {
-					logrus.WithError(err).Error("Failed to send 'No groups found' message over WebSocket")
-					return err
-				}
-				continue
+		if requestData.Stat == "new" {
+			err = sendUpdatedGroup()
+			if err != nil {
+				return err
 			}
-			return echo.ErrInternalServerError
-		}
-		users, err := database.GetAllUsersInGroup(uint(groupID))
-		if err != nil {
-			return echo.ErrInternalServerError
-		}
-
-		err = ws.WriteJSON(echo.Map{
-			"group": group,
-			"users": users,
-		})
-		if err != nil {
-			logrus.WithError(err).Error("Failed to send group data over WebSocket")
-			return err
 		}
 	}
 	return nil
