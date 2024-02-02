@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"sync"
 )
 
 var upgrader = websocket.Upgrader{
@@ -19,6 +20,8 @@ var upgrader = websocket.Upgrader{
 		return true
 	},
 }
+var activeUsers = make(map[uint]*websocket.Conn)
+var activeUsersMutex = &sync.Mutex{}
 
 func CreateDirectChat(c echo.Context) error {
 	userID := c.Get("id").(string)
@@ -79,6 +82,14 @@ func NewChatMessageWs(c echo.Context) error {
 		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
 		return echo.ErrUnauthorized
 	}
+	activeUsersMutex.Lock()
+	activeUsers[uint(senderIDInt)] = ws
+	activeUsersMutex.Unlock()
+	defer func() {
+		activeUsersMutex.Lock()
+		delete(activeUsers, uint(senderIDInt))
+		activeUsersMutex.Unlock()
+	}()
 
 	chatID, err := strconv.ParseUint(c.QueryParam("chatID"), 10, 0)
 	if err != nil {
@@ -86,6 +97,12 @@ func NewChatMessageWs(c echo.Context) error {
 		logrus.WithError(err).Error("Invalid chat ID")
 		return err
 	}
+	chat, err := database.GetDirectChatByID(uint(chatID))
+	if err != nil {
+		return err
+	}
+	participantOnline := isUserOnline(chat.ReceiverID)
+	ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Participant online: %v", participantOnline)))
 
 	for {
 		var incomingMessage struct {
@@ -136,12 +153,26 @@ func NewChatMessageWs(c echo.Context) error {
 			logrus.WithError(err).Error("Error while creating message")
 			return err
 		}
-
 		ws.WriteMessage(websocket.TextMessage, []byte("Message sent"))
+		if chat.SenderID == uint(senderIDInt) {
+			receiverOnline := isUserOnline(chat.ReceiverID)
+			ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Receiver online: %v", receiverOnline)))
+		} else {
+			senderOnline := isUserOnline(chat.SenderID)
+			ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Receiver online: %v", senderOnline)))
+		}
+
 	}
 
 	return nil
 }
+func isUserOnline(userID uint) bool {
+	activeUsersMutex.Lock()
+	defer activeUsersMutex.Unlock()
+	_, online := activeUsers[userID]
+	return online
+}
+
 func GetMessageByCountWs(c echo.Context) error {
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
@@ -156,12 +187,33 @@ func GetMessageByCountWs(c echo.Context) error {
 		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
 		return echo.ErrUnauthorized
 	}
+	activeUsersMutex.Lock()
+	activeUsers[uint(receiverIDInt)] = ws
+	activeUsersMutex.Unlock()
+	defer func() {
+		activeUsersMutex.Lock()
+		delete(activeUsers, uint(receiverIDInt))
+		activeUsersMutex.Unlock()
+	}()
 
 	chatID, err := strconv.ParseUint(c.QueryParam("chatID"), 10, 0)
 	if err != nil {
 		logrus.WithError(err).Error("Invalid chat ID")
 		ws.WriteMessage(websocket.TextMessage, []byte("Invalid chat ID"))
 		return echo.ErrBadRequest
+	}
+	chat, err := database.GetDirectChatByID(uint(chatID))
+	if err != nil {
+		logrus.WithError(err).Error("Error while retrieving chat")
+		ws.WriteMessage(websocket.TextMessage, []byte("Error while retrieving chat"))
+		return echo.ErrInternalServerError
+	}
+	if chat.SenderID == uint(receiverIDInt) {
+		receiverOnline := isUserOnline(chat.ReceiverID)
+		ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Sender online: %v", receiverOnline)))
+	} else {
+		senderOnline := isUserOnline(chat.SenderID)
+		ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Sender online: %v", senderOnline)))
 	}
 
 	for {
@@ -181,13 +233,6 @@ func GetMessageByCountWs(c echo.Context) error {
 
 		if requestData.Stat == "exit" {
 			break
-		}
-
-		chat, err := database.GetDirectChatByID(uint(chatID))
-		if err != nil {
-			logrus.WithError(err).Error("Error while retrieving chat")
-			ws.WriteMessage(websocket.TextMessage, []byte("Error while retrieving chat"))
-			return echo.ErrInternalServerError
 		}
 
 		if chat == nil || (chat.SenderID != uint(receiverIDInt) && chat.ReceiverID != uint(receiverIDInt)) {
@@ -232,6 +277,15 @@ func GetDirectChatsWs(c echo.Context) error {
 		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
 		return echo.ErrUnauthorized
 	}
+
+	activeUsersMutex.Lock()
+	activeUsers[uint(userIDInt)] = ws
+	activeUsersMutex.Unlock()
+	defer func() {
+		activeUsersMutex.Lock()
+		delete(activeUsers, uint(userIDInt))
+		activeUsersMutex.Unlock()
+	}()
 
 	sendUpdatedChats := func() error {
 
