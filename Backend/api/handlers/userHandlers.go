@@ -239,15 +239,18 @@ func UpdateUserInformation(c echo.Context) error {
 	}
 	logrus.Infof(username)
 	profilePicture, err := c.FormFile("profile")
-	println(profilePicture)
 	if err != nil {
-		if err != http.ErrMissingFile {
+		if !errors.Is(err, http.ErrMissingFile) {
 			logrus.Printf("Error opening file: %v\n", err)
 			return c.JSON(http.StatusBadRequest, "Unable to open file")
 		}
 	} else {
 		profilePath, err := services.UploadS3(services.StorageSession, profilePicture, configs.Config.StorageServiceBucket, username)
 		if err != nil {
+			if errors.Is(err, errors.New("file too big")) {
+				return c.String(http.StatusBadRequest, "Image for profile picture is too big")
+			}
+
 			logrus.Printf("Unable to upload image\n")
 			return c.String(http.StatusInternalServerError, "Unable to upload profile picture")
 		}
