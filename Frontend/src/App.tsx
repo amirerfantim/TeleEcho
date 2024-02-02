@@ -5,6 +5,7 @@ import Profile from './components/Profile';
 import React from "react";
 import ContactsPage from "./components/ContactsPage";
 import GroupsPage from "./components/GroupsPage";
+import DirectChatPage from "./components/DirectChatPage";
 
 const App: React.FC = () => {
     return (
@@ -15,6 +16,7 @@ const App: React.FC = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/contacts" element={<ContactsPage />} />
                 <Route path="/group" element={<GroupsPage />} />
+                <Route path="/chat/:chatId" element={<DirectChatPage />} />
 
             </Routes>
         </Router>
