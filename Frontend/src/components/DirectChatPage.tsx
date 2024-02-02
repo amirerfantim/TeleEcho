@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import groupIcon from "../assets/group.png"; // Adjust path as per your project structure
 import contactIcon from "../assets/contact.png";
 import profileIcon from "../assets/profile.png"; // Adjust path as per your project structure
-import chatIcon from "../assets/chat.png" ; // Adjust path as per your project structure
+import chatIcon from "../assets/chat.png" ;
+import deleteIcon from "../assets/delete_icon.png"; // Adjust path as per your project structure
 
 
 interface Message {
@@ -85,6 +86,31 @@ const DirectChatPage: React.FC = () => {
         setMessages(sortedMessages);
     };
 
+    const deleteChat = async () => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this chat?");
+        if (confirmDelete) {
+            try {
+                const response = await fetch(`http://127.0.0.1:8020/chat/${chatId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `${getToken()}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    alert("Chat deleted successfully.");
+                    navigate('/chats'); // Redirect to a safe route after deletion
+                } else {
+                    alert("Failed to delete chat.");
+                }
+            } catch (error) {
+                console.error("Error deleting chat:", error);
+                alert("An error occurred while deleting the chat.");
+            }
+        }
+    }
+
     return (
         <div className="chat-page">
             <button className="navigate-first" onClick={() => navigate('/profile')}>
@@ -98,6 +124,9 @@ const DirectChatPage: React.FC = () => {
             </button>
             <button className="navigate-fourth" onClick={() => navigate('/chats')}>
                 <img src={chatIcon} alt="chats"/>
+            </button>
+            <button className="add-button-second" onClick={deleteChat}>
+                <img src={deleteIcon} alt="Profile"/>
             </button>
             <div className="messages-container">
                 {messages.map((message) => (
