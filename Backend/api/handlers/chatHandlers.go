@@ -26,6 +26,8 @@ type TypingStatus struct {
 	mu    sync.Mutex
 }
 
+var typeStatus *TypingStatus
+
 func NewTypingStatus() *TypingStatus {
 	return &TypingStatus{
 		Users: make(map[uint]bool),
@@ -131,7 +133,7 @@ func NewChatMessageWs(c echo.Context) error {
 	}
 	participantOnline := isUserOnline(chat.ReceiverID)
 	ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Participant online: %v", participantOnline)))
-	typingStatus := NewTypingStatus()
+	typeStatus = NewTypingStatus()
 	for {
 		var incomingMessage struct {
 			Content string `json:"content"`
@@ -174,7 +176,7 @@ func NewChatMessageWs(c echo.Context) error {
 			ws.WriteMessage(websocket.TextMessage, []byte("Message content cannot be empty"))
 			continue
 		}
-		typingStatus.SetTyping(chat.ReceiverID)
+		typeStatus.SetTyping(uint(senderIDInt))
 
 		_, err = database.CreateMessage(uint(chatID), model.TypeDirectChat, incomingMessage.Content)
 		if err != nil {
@@ -183,7 +185,7 @@ func NewChatMessageWs(c echo.Context) error {
 			return err
 		}
 		ws.WriteMessage(websocket.TextMessage, []byte("Message sent"))
-		typingStatus.SetNotTyping(chat.ReceiverID)
+
 		if chat.SenderID == uint(senderIDInt) {
 			receiverOnline := isUserOnline(chat.ReceiverID)
 			ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Receiver online: %v", receiverOnline)))
@@ -245,7 +247,6 @@ func GetMessageByCountWs(c echo.Context) error {
 		senderOnline := isUserOnline(chat.SenderID)
 		ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Sender online: %v", senderOnline)))
 	}
-	typingStatus := NewTypingStatus()
 	for {
 		var requestData struct {
 			Count uint   `json:"count"`
@@ -284,8 +285,11 @@ func GetMessageByCountWs(c echo.Context) error {
 		if count > uint(len(messages)) {
 			count = uint(len(messages))
 		}
-		if typingStatus.IsTyping(uint(chat.SenderID)) {
-			ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("User %d is typing...", receiverIDInt)))
+		if typeStatus != nil {
+			if typeStatus.IsTyping(uint(chat.SenderID)) {
+				ws.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("User %d is typing...", chat.SenderID)))
+			}
+
 		}
 
 		if err := ws.WriteJSON(messages[:count]); err != nil {
