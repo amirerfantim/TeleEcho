@@ -17,6 +17,18 @@ interface Message {
     createdAt: string;
 }
 
+interface Chat {
+    chatID: number;
+    user: {
+        id: number;
+        username: string;
+        firstname: string;
+        lastname: string;
+    };
+    unreadMessage: number;
+}
+
+
 const DirectChatPage: React.FC = () => {
     const {chatId} = useParams<{ chatId: string }>();
     // const chatId = "10";
@@ -25,6 +37,10 @@ const DirectChatPage: React.FC = () => {
     const wsSend = useRef<WebSocket | null>(null);
     const wsReceive = useRef<WebSocket | null>(null);
     const navigate = useNavigate();
+    const [showModal, setShowModal] = useState(false);
+    const [copiedMessage, setCopiedMessage] = useState('');
+    const [chats, setChats] = useState<Chat[]>([]); // Assuming Chat interface is defined
+
 
     useEffect(() => {
         // Connect to SendMessage WebSocket
@@ -52,6 +68,54 @@ const DirectChatPage: React.FC = () => {
             wsReceive.current?.close();
         };
     }, [chatId]); // Reconnect if chatId changes
+
+    useEffect(() => {
+        const token = '' + getToken();
+        const wsSendMessageUrl = `ws://127.0.0.1:8020/write-message?chatID=${chatId}&token=${token}`;
+        wsSend.current = new WebSocket(wsSendMessageUrl);
+
+        wsSend.current.onopen = () => console.log('Send WS Connection established');
+
+        // Cleanup function to close WebSocket connections
+        return () => {
+            wsSend.current?.close();
+        };
+    }, [chatId]);
+
+    useEffect(() => {
+        const token = getToken();
+        const wsUrl = `ws://127.0.0.1:8020/all-chat?token=${token}`;
+        const wsChats = new WebSocket(wsUrl);
+
+        wsChats.onmessage = (e) => {
+            const receivedChats = JSON.parse(e.data);
+            console.log("Fetched chats:", receivedChats); // Log the fetched chats
+            setChats(receivedChats);
+        };
+
+        return () => {
+            wsChats.close();
+        };
+    }, []); // Empty d
+
+
+
+    const handleCopyMessage = (content: string) => {
+        setCopiedMessage(content);
+        setShowModal(true);
+    };
+
+
+    const handleSendCopiedMessage = ({chatID}: { chatID: any }) => {
+        if (copiedMessage.trim() !== '') {
+            sendMessageToChat({chatID: chatID, messageContent: copiedMessage});
+            setCopiedMessage('');
+            setShowModal(false);
+        }
+    };
+
+
+
 
     const sendMessage = () => {
         if (newMessage.trim() !== '') {
@@ -111,6 +175,56 @@ const DirectChatPage: React.FC = () => {
         }
     }
 
+    class ChatSelectionModal extends React.Component<{ isOpen: boolean, onClose: () => void, onChatSelect: (chatID: number) => void }> {
+        render() {
+            const { isOpen, onClose, onChatSelect } = this.props;
+            if (!isOpen) return null;
+
+            return (
+                <div className="modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={onClose}>&times;</span>
+                        <ul>
+                            {chats.map((chat) => (
+                                <li key={chat.chatID} onClick={() => onChatSelect(chat.chatID)}>
+                                    {chat.user.firstname} {chat.user.lastname}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            );
+        }
+    }
+
+    // Helper function to send a message using a new WebSocket connection
+    const sendMessageToChat = ({chatID, messageContent}: { chatID: any, messageContent: any }) => {
+        const token = '' + getToken(); // Ensure you have a function to get the current user's token
+        const adjustedChatID = chatID % 2 === 1 ? chatID + 1 : chatID;
+        const wsUrl = `ws://127.0.0.1:8020/write-message?chatID=${adjustedChatID}&token=${token}`;
+        const tempWs = new WebSocket(wsUrl);
+
+        tempWs.onopen = () => {
+            console.log('Temporary WS Connection for sending message established');
+            console.log(chatID)
+            tempWs.send(JSON.stringify({
+                chatID: chatID,
+                content: messageContent,
+                stat: 'sending',
+            }));
+
+            // Close the connection after sending the message
+            tempWs.close();
+        };
+
+        tempWs.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        // Optionally handle the tempWs.onclose event
+    };
+
+
     return (
         <div className="chat-page">
             <button className="navigate-first" onClick={() => navigate('/profile')}>
@@ -132,13 +246,24 @@ const DirectChatPage: React.FC = () => {
                 {messages.map((message) => (
                     <div key={message.id} className={`message ${message.senderId === 22 ? 'sent' : 'received'}`}>
                         {message.content}
+                        <button onClick={() => handleCopyMessage(message.content)}>Copy</button>
                     </div>
+
                 ))}
             </div>
             <div className="message-input">
                 <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)}/>
                 <button onClick={sendMessage}>Send</button>
             </div>
+
+            {showModal && (
+                <ChatSelectionModal
+                    isOpen={showModal}
+                    onClose={() => setShowModal(false)}
+                    onChatSelect={(chatID) => handleSendCopiedMessage({chatID: chatID})}
+                />
+            )}
+
         </div>
     );
 };
