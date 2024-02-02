@@ -6,6 +6,7 @@ import groupIcon from "../assets/group.png";
 import contactIcon from "../assets/contact.png";
 import deleteIcon from "../assets/delete_icon.png";
 import addUserIcon from "../assets/add.png";
+import chatIcon from "../assets/chat.png";
 
 
 interface Group {
@@ -241,6 +242,9 @@ const GroupsPage: React.FC = () => {
             <button className="navigate-second" onClick={() => navigate('/contacts')}>
                 <img src={contactIcon} alt="Groups"/>
             </button>
+            <button className="navigate-third" onClick={() => navigate('/chats')}>
+                <img src={chatIcon} alt="Chat"/>
+            </button>
             <button className="add-button-first" onClick={() => setShowAddGroupModal(true)}>+</button>
 
             {responseMessage && (
@@ -324,7 +328,8 @@ const GroupsPage: React.FC = () => {
                             {contacts.map(contact => (
                                 <div key={contact.id} className="contact-card">
                                     <div>{contact.firstname} {contact.lastname}</div>
-                                    <button onClick={() => handleAddUsersToGroup(contact.username)}>Add to Group</button>
+                                    <button onClick={() => handleAddUsersToGroup(contact.username)}>Add to Group
+                                    </button>
                                 </div>
                             ))}
                         </div>
@@ -333,7 +338,6 @@ const GroupsPage: React.FC = () => {
             )}
         </div>
     );
-
 
 
 };
