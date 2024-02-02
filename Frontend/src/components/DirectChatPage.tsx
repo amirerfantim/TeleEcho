@@ -11,8 +11,8 @@ interface Message {
 }
 
 const DirectChatPage: React.FC = () => {
-    // const {chatId} = useParams<{ chatId: string }>();
-    const chatId = "10";
+    const {chatId} = useParams<{ chatId: string }>();
+    // const chatId = "10";
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const wsSend = useRef<WebSocket | null>(null);

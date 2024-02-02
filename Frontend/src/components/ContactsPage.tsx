@@ -72,7 +72,7 @@ const ContactsPage = () => {
         navigate('/group');
     };
 
-    const navigateToDirectChat = async ({contactId}: { contactId: any }) => {
+    const navigateToChats = async ({contactId}: { contactId: any }) => {
         const receiverID = contactId.toString(); // Assuming `contactId` is available in this scope
 
         try {
@@ -85,8 +85,7 @@ const ContactsPage = () => {
                 body: new URLSearchParams({ receiverID }).toString(), // Correctly format the body data
             });
 
-            const chatId = await response.json(); // Assuming the response body will directly be the chatId
-            navigate(`/chat/${chatId}`); // Navigate to the chat page using the returned chatId
+            // navigate(`/chat/${chatId}`); // Navigate to the chat page using the returned chatId
             if (response.ok) {
             } else {
                 // Handle errors if the request wasn't successful
@@ -96,6 +95,7 @@ const ContactsPage = () => {
         } catch (error) {
             console.error('Error:', error);
         }
+        navigate('/chats'); // Update this to the correct path for your ChatsPage
     };
 
 
@@ -210,7 +210,7 @@ const ContactsPage = () => {
             <ul className="contacts-container">
                 {contacts.map(contact => (
                     <li key={contact.id} className="contact-card"
-                        onClick={() => navigateToDirectChat({contactId: contact.id})}>
+                        onClick={() => navigateToChats({contactId: contact.id})}>
                         <div className="contact-info">
                             <div className="name">{contact.firstname} {contact.lastname}</div>
                             <div className="details">@{contact.username} | {contact.phone}</div>
