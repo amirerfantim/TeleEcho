@@ -104,6 +104,10 @@ func NewChatMessageWs(c echo.Context) error {
 		if incomingMessage.Stat == "exit" {
 			break
 		}
+		if len(incomingMessage.Content) > 500 {
+			ws.WriteMessage(websocket.TextMessage, []byte("Message is too big"))
+			continue
+		}
 
 		chat, err := database.GetDirectChatByID(uint(chatID))
 		if err != nil {
