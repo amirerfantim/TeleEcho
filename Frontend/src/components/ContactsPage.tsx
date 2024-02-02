@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import './css/ContactsPage.css';
-import { useNavigate } from 'react-router-dom'; // Import useHistory from react-router-dom
+import {useNavigate} from 'react-router-dom'; // Import useHistory from react-router-dom
 import deleteIcon from '../assets/delete_icon.png';
 import profileIcon from '../assets/profile.png'; // Import your profile icon
-import groupIcon from '../assets/group.png'; // Import your profile icon
-
+import groupIcon from '../assets/group.png';
+import {getToken} from "./AuthHelper"; // Import your profile icon
 
 
 interface Contact {
@@ -23,7 +23,7 @@ interface ModalProps {
     handleNewContactPhoneChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Modal: React.FC<ModalProps> = ({ show, onClose, onAddContact, newContactPhone, handleNewContactPhoneChange }) => {
+const Modal: React.FC<ModalProps> = ({show, onClose, onAddContact, newContactPhone, handleNewContactPhoneChange}) => {
     if (!show) {
         return null;
     }
@@ -71,6 +71,33 @@ const ContactsPage = () => {
     const navigateToGroups = () => {
         navigate('/group');
     };
+
+    const navigateToDirectChat = async ({contactId}: { contactId: any }) => {
+        const receiverID = contactId.toString(); // Assuming `contactId` is available in this scope
+
+        try {
+            const response = await fetch('http://127.0.0.1:8020/chat', {
+                method: 'POST',
+                headers: {
+                    'Authorization': '' + getToken(), // Adjust based on actual token retrieval method
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ receiverID }).toString(), // Correctly format the body data
+            });
+
+            const chatId = await response.json(); // Assuming the response body will directly be the chatId
+            navigate(`/chat/${chatId}`); // Navigate to the chat page using the returned chatId
+            if (response.ok) {
+            } else {
+                // Handle errors if the request wasn't successful
+                const errorData = await response.json();
+                console.error(errorData.error || 'An error occurred while creating the chat.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
 
 
     const fetchContacts = () => {
@@ -182,7 +209,8 @@ const ContactsPage = () => {
 
             <ul className="contacts-container">
                 {contacts.map(contact => (
-                    <li key={contact.id} className="contact-card">
+                    <li key={contact.id} className="contact-card"
+                        onClick={() => navigateToDirectChat({contactId: contact.id})}>
                         <div className="contact-info">
                             <div className="name">{contact.firstname} {contact.lastname}</div>
                             <div className="details">@{contact.username} | {contact.phone}</div>
@@ -202,7 +230,8 @@ const ContactsPage = () => {
                 <img src={groupIcon} alt="Groups"/>
             </button>
             <div className="add-contact-container">
-                <button className="add-button-first" onClick={() => setShowAddContactForm(!showAddContactForm)}>+</button>
+                <button className="add-button-first" onClick={() => setShowAddContactForm(!showAddContactForm)}>+
+                </button>
                 <Modal
                     show={showAddContactForm}
                     onClose={() => setShowAddContactForm(false)}
