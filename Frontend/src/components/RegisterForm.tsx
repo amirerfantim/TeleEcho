@@ -16,23 +16,57 @@ const RegisterForm = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
     const formRef = useRef<HTMLFormElement>(null);
+    const validatePassword = (password: string) => {
+        return password.length >= 8;
+    };
+
+    const validateBio = (bio: string) => bio.length <= 100;
+    const validateProfile = (file: File) => file.size <= 1048576; // Size must be less than or equal to 1MB
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        if (e.target.name === 'profile') {
+        const { name, value } = e.target;
+
+        // Reset error message on each change
+        setErrorMessage('');
+
+        if (name === 'profile') {
             const file = (e.target as HTMLInputElement).files?.[0];
-            if (file) {
+            if (file && validateProfile(file)) {
                 setProfilePicture(file);
             } else {
                 setProfilePicture(null);
-            }        } else {
-            setFormData({ ...formData, [e.target.name]: e.target.value });
+                if (file) {
+                    setErrorMessage('Profile picture must be less than 1MB');
+                }
+            }
+        } else if (name === 'bio') {
+            if (validateBio(value)) {
+                setFormData({ ...formData, [name]: value });
+            } else {
+                setErrorMessage('Biography must be less than 100 characters');
+            }
+        } else {
+            setFormData({ ...formData, [name]: value });
         }
     };
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setErrorMessage('');
         setSuccessMessage('');
+
+        if (!validatePassword(formData.password)) {
+            setErrorMessage('Password must be at least 8 characters long');
+            return;
+        }
+        if (!validateBio(formData.bio)) {
+            setErrorMessage('Biography must be less than 100 characters');
+            return;
+        }
+        if (profilePicture && !validateProfile(profilePicture)) {
+            setErrorMessage('Profile picture must be less than 1MB');
+            return;
+        }
 
         const formDataObj = new FormData();
         for (const key in formData) {
@@ -75,10 +109,6 @@ const RegisterForm = () => {
                     <input type="file" className="form-control" name="profile" onChange={handleChange}
                            placeholder="Profile Picture"/>
                     <textarea className="form-control" name="bio" value={formData.bio} onChange={handleChange} placeholder="Bio" rows={3}></textarea>
-                    <div className="button-container">
-                        <button type="submit" className="btn btn-primary">Submit</button>
-                        <button type="button" className="btn btn-secondary" onClick={() => navigate('/login')}>Login</button>
-                    </div>
                     {successMessage && (
                         <div className="alert alert-success" role="alert">
                             {successMessage}
@@ -89,6 +119,10 @@ const RegisterForm = () => {
                             {errorMessage}
                         </div>
                     )}
+                    <div className="button-container">
+                        <button type="submit" className="btn btn-primary">Submit</button>
+                        <button type="button" className="btn btn-secondary" onClick={() => navigate('/login')}>Login</button>
+                    </div>
                 </form>
             </div>
         </div>
