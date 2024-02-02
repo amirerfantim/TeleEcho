@@ -40,6 +40,7 @@ const DirectChatPage: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [copiedMessage, setCopiedMessage] = useState('');
     const [chats, setChats] = useState<Chat[]>([]); // Assuming Chat interface is defined
+    const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
 
     useEffect(() => {
@@ -97,6 +98,29 @@ const DirectChatPage: React.FC = () => {
             wsChats.close();
         };
     }, []); // Empty d
+
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            const response = await fetch('http://127.0.0.1:8020/users', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                console.error("Failed to fetch user information");
+                return;
+            }
+
+            const data = await response.json();
+            setCurrentUserId(data.id); // Assuming the user object has an id field
+        };
+
+        fetchUserInfo();
+    }, []);
+
 
 
 
@@ -243,14 +267,19 @@ const DirectChatPage: React.FC = () => {
                 <img src={deleteIcon} alt="Profile"/>
             </button>
             <div className="messages-container">
-                {messages.map((message) => (
-                    <div key={message.id} className={`message ${message.senderId === 22 ? 'sent' : 'received'}`}>
-                        {message.content}
-                        <button onClick={() => handleCopyMessage(message.content)}>Copy</button>
-                    </div>
+                {messages.map((message) => {
+                    // console.log(`Message ID: ${message.id}, Sender ID: ${message.senderId}, Current User ID: ${currentUserId}`);
 
-                ))}
+                    return (
+                        <div key={message.id}
+                             className={`message ${message.senderId === currentUserId ? 'sent' : 'received'}`}>
+                            {message.content}
+                            <button onClick={() => handleCopyMessage(message.content)}>+</button>
+                        </div>
+                    );
+                })}
             </div>
+
             <div className="message-input">
                 <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)}/>
                 <button onClick={sendMessage}>Send</button>

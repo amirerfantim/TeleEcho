@@ -7,6 +7,7 @@ import contactIcon from "../assets/contact.png";
 import deleteIcon from "../assets/delete_icon.png";
 import addUserIcon from "../assets/add.png";
 import chatIcon from "../assets/chat.png";
+import {getToken} from "./AuthHelper";
 
 
 interface Group {
@@ -227,6 +228,28 @@ const GroupsPage: React.FC = () => {
         }
     };
 
+    const createGroupChat = async ({groupId}: { groupId: any }) => {
+        try {
+            const response = await fetch('http://127.0.0.1:8020/group-chat', {
+                method: 'POST',
+                headers: {
+                    'Authorization': '' + getToken(), // Make sure to replace this with your actual token retrieval logic
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ groupID: groupId.toString() })
+            });
+            navigate('/all-groups');
+            if (!response.ok) {
+                throw new Error('Failed to create group chat');
+            }
+
+            // Handle success
+            console.log('Group Chat created successfully');
+        } catch (error) {
+            console.error('Error creating group chat:', error);
+        }
+    };
+
 
 
 
@@ -253,7 +276,7 @@ const GroupsPage: React.FC = () => {
 
             <div className="groups-container">
                 {groups.map(group => (
-                    <div key={group.id} className="group-card" onClick={() => navigateToGroup(group.id)}>
+                    <div key={group.id} className="group-card" onClick={() => createGroupChat({groupId: group.id})}>
                         <h3>{group.name}</h3>
                         <p>{group.description}</p>
                         {/* Display users for each group */}
@@ -266,13 +289,13 @@ const GroupsPage: React.FC = () => {
                         </div>
                         <div className="group-card-actions">
                             <button className="delete-button" onClick={(e) => {
-                                e.stopPropagation(); // Prevents navigating to the group detail page
+                                e.stopPropagation(); // Prevents the group chat creation
                                 handleDeleteGroup(group.id);
                             }}>
                                 <img src={deleteIcon} alt="Delete"/>
                             </button>
                             <button className="add-user-group-button" onClick={(e) => {
-                                e.stopPropagation(); // Prevent navigating to group detail
+                                e.stopPropagation(); // Prevent the group chat creation
                                 openAddUsersModal(group.id);
                             }}>
                                 <img src={addUserIcon} alt="Add User"/>
@@ -281,6 +304,7 @@ const GroupsPage: React.FC = () => {
                     </div>
                 ))}
             </div>
+
             {showAddGroupModal && (
                 <div className="modal">
                     <div className="modal-content">
