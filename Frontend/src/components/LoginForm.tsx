@@ -33,7 +33,7 @@ const LoginForm: React.FC = () => {
 
             if (response.ok) {
                 localStorage.setItem('token', data.token as string);
-                navigate('/contacts');
+                navigate('/profile');
             } else {
                 setErrorMessage(data || 'Login failed');
             }
