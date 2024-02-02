@@ -41,8 +41,7 @@ const ChatsPage: React.FC = () => {
     }, []);
 
     const navigateToChat = (chatID: number) => {
-        const adjustedChatID = chatID % 2 === 1 ? chatID + 1 : chatID;
-        navigate(`/chat/${adjustedChatID}`);
+        navigate(`/chat/${chatID}`);
     };
 
     return (
