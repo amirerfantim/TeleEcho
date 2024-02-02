@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"TeleEcho/api/database"
+	"TeleEcho/middleware"
 	"TeleEcho/model"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"sort"
 	"strconv"
 )
 
@@ -134,6 +136,152 @@ func GetGroupChatWs(c echo.Context) error {
 		})
 		if err != nil {
 			logrus.WithError(err).Error("Failed to send group data over WebSocket")
+			return err
+		}
+	}
+	return nil
+}
+
+func NewGroupMessageWs(c echo.Context) error {
+	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to upgrade WebSocket connection")
+		return err
+	}
+	defer ws.Close()
+
+	userIDInt, checkJWT := middleware.ValidateJWTToken(c.QueryParam("token"))
+	if !checkJWT {
+		logrus.WithError(err).Error("Failed to validate JWT")
+		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
+		return echo.ErrUnauthorized
+	}
+
+	groupID, err := strconv.ParseUint(c.QueryParam("groupID"), 10, 64)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to parse group ID")
+		return echo.ErrBadRequest
+	}
+
+	for {
+		var incomingMessage struct {
+			UserID         uint   `json:"userid"`
+			MessageContent string `json:"content"`
+			Stat           string `json:"stat"`
+		}
+		err = ws.ReadJSON(&incomingMessage)
+		logrus.Println(incomingMessage)
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				logrus.WithError(err).Error("Unexpected WebSocket close error")
+				return err
+			}
+			return echo.ErrInternalServerError
+		}
+
+		if incomingMessage.Stat == "exit" {
+			break
+		}
+		userID := incomingMessage.UserID
+		messageContent := incomingMessage.MessageContent
+
+		if userID != uint(userIDInt) {
+			logrus.WithField("UserID", userID).Warn("Unauthorized user")
+			ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized"))
+			continue
+		}
+		check, err := database.IsUserInGroup(uint(userIDInt), uint(groupID))
+		if err != nil {
+			logrus.WithError(err).Error("Failed to fetch user group data")
+			return echo.ErrInternalServerError
+		}
+
+		if !check {
+			logrus.Warn("User is not part of this group")
+			ws.WriteMessage(websocket.TextMessage, []byte("You are not part of this group"))
+			continue
+		}
+
+		if messageContent == "" {
+			logrus.Warn("Message body is empty")
+			ws.WriteMessage(websocket.TextMessage, []byte("Message body cannot be empty"))
+			continue
+		}
+
+		_, err = database.CreateMessage(uint(groupID), model.TypeGroupChat, messageContent)
+
+		if err != nil {
+			logrus.WithError(err).Error("Failed to create a new message")
+			return echo.ErrInternalServerError
+		}
+
+		ws.WriteMessage(websocket.TextMessage, []byte("Message sent"))
+	}
+
+	return nil
+}
+func GetGroupMessagesWs(c echo.Context) error {
+	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		logrus.WithError(err).Error("WebSocket upgrade failed")
+		return err
+	}
+	defer ws.Close()
+	userIDInt, checkJWT := middleware.ValidateJWTToken(c.QueryParam("token"))
+	if !checkJWT {
+		logrus.WithError(err).Error("Failed to validate JWT")
+		ws.WriteMessage(websocket.TextMessage, []byte("Unauthorized access"))
+		return echo.ErrUnauthorized
+	}
+
+	groupIDParam := c.QueryParam("groupID")
+	groupIDInt, err := strconv.ParseUint(groupIDParam, 10, 0)
+	if err != nil {
+		logrus.WithError(err).Error("Invalid group ID")
+		return echo.ErrBadRequest
+	}
+	for {
+		var requestData struct {
+			Count uint64 `json:"count"`
+			Stat  string `json:"stat"`
+		}
+
+		if err := ws.ReadJSON(&requestData); err != nil {
+			logrus.WithError(err).Error("Failed to read message from WebSocket")
+			break
+		}
+
+		if requestData.Stat == "exit" {
+			break
+		}
+		isMember, err := database.IsUserInGroup(uint(userIDInt), uint(groupIDInt))
+		if err != nil {
+			logrus.WithError(err).Error("Can not check user in group")
+			return echo.ErrInternalServerError
+		}
+		if !isMember {
+			ws.WriteMessage(websocket.TextMessage, []byte("You are not part of this group"))
+			continue
+		}
+		groupChat, err := database.FindGroupChatByGroupID(uint(groupIDInt))
+		if err != nil {
+			logrus.WithError(err).Error("Failed to retrieve group chat")
+			return echo.ErrInternalServerError
+		}
+		messages, err := database.GetMessagesByChatIDAndType(groupChat.ID, model.TypeGroupChat)
+		if err != nil {
+			logrus.WithError(err).Error("Failed to retrieve group messages")
+			return echo.ErrInternalServerError
+		}
+		sort.Slice(messages, func(i, j int) bool {
+			return messages[i].CreatedAt.After(messages[j].CreatedAt)
+		})
+		count := requestData.Count
+		if count > uint64(len(messages)) {
+			count = uint64(len(messages))
+		}
+		if err := ws.WriteJSON(messages[:count]); err != nil {
+			logrus.WithError(err).Error("Failed to write messages to WebSocket")
 			return err
 		}
 	}

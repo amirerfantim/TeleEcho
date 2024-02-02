@@ -175,3 +175,21 @@ func GetGroupByID(id uint) (*model.Group, error) {
 
 	return &group, nil
 }
+func FindGroupChatByGroupID(groupID uint) (*model.GroupChat, error) {
+	var groupChat model.GroupChat
+	result := DB.Where("group_id = ?", groupID).First(&groupChat)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			logrus.WithFields(logrus.Fields{
+				"groupID": groupID,
+			}).Info("No GroupChat found for the given GroupID")
+			return nil, NotFoundChat
+		}
+		logrus.WithFields(logrus.Fields{
+			"groupID": groupID,
+		}).WithError(result.Error).Error("Failed to retrieve GroupChat")
+		return nil, result.Error
+	}
+
+	return &groupChat, nil
+}

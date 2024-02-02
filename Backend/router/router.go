@@ -53,6 +53,8 @@ func New() *echo.Echo {
 	e.GET("/read-message", handlers.GetMessageByCountWs)
 
 	e.GET("/all-group-chat", handlers.GetGroupChatWs)
+	e.GET("/write-group-message", handlers.NewGroupMessageWs)
+	e.GET("/read-group-message", handlers.GetGroupMessagesWs)
 
 	return e
 }
