@@ -26,12 +26,18 @@ func RegisterUser(c echo.Context) error {
 	lastname := c.FormValue("lastname")
 	phone := c.FormValue("phone")
 	password := c.FormValue("password")
+	if len(password) < 8 {
+		return c.JSON(http.StatusBadRequest, "Password is too easy")
+	}
 	profilePicture, err := c.FormFile("profile")
 	if err != nil {
 		logrus.Printf("Unable to open image\n")
 		return c.String(http.StatusBadRequest, "Unable to open file")
 	}
 	bio := c.FormValue("bio")
+	if len(bio) > 200 {
+		return c.String(http.StatusBadRequest, "Bio is too big")
+	}
 	usernameOK := database.IsUsernameDuplicate(username)
 	phoneNumberOk := database.IsPhoneDuplicate(phone)
 	if usernameOK {
@@ -39,6 +45,9 @@ func RegisterUser(c echo.Context) error {
 			profilePath, err := services.UploadS3(services.StorageSession, profilePicture, configs.Config.StorageServiceBucket, username)
 			if err != nil {
 				logrus.Printf("Unable to upload image\n")
+				if errors.Is(err, errors.New("file too big")) {
+					return c.String(http.StatusBadRequest, "Image for profile picture is too big")
+				}
 				return c.String(http.StatusInternalServerError, "Unable to upload profile picture")
 			}
 			hashFunc := sha256.New()
@@ -239,9 +248,8 @@ func UpdateUserInformation(c echo.Context) error {
 	}
 	logrus.Infof(username)
 	profilePicture, err := c.FormFile("profile")
-	println(profilePicture)
 	if err != nil {
-		if err != http.ErrMissingFile {
+		if !errors.Is(err, http.ErrMissingFile) {
 			logrus.Printf("Error opening file: %v\n", err)
 			return c.JSON(http.StatusBadRequest, "Unable to open file")
 		}
@@ -249,6 +257,10 @@ func UpdateUserInformation(c echo.Context) error {
 		profilePath, err := services.UploadS3(services.StorageSession, profilePicture, configs.Config.StorageServiceBucket, username)
 		if err != nil {
 			logrus.Printf("Unable to upload image\n")
+			if errors.Is(err, errors.New("file too big")) {
+				return c.String(http.StatusBadRequest, "Image for profile picture is too big")
+			}
+
 			return c.String(http.StatusInternalServerError, "Unable to upload profile picture")
 		}
 		user.ProfilePicture = profilePath
@@ -256,6 +268,9 @@ func UpdateUserInformation(c echo.Context) error {
 
 	bio := c.FormValue("bio")
 	if bio != "" {
+		if len(bio) > 100 {
+			return c.String(http.StatusBadRequest, "Bio is too big")
+		}
 		user.Bio = bio
 	}
 	err = database.UpdateUserByUserID(uint(userIDInt), *user)

@@ -8,7 +8,7 @@ type User struct {
 	Phone          string `json:"phone" gorm:"type:varchar(255);not null;unique" `
 	Password       string `json:"-" gorm:"type:varchar(255);not null"`
 	ProfilePicture string `json:"profilePicture,omitempty" gorm:"type:varchar(255);unique;default:''"`
-	Bio            string `json:"Bio,omitempty" gorm:"type:varchar(255);default:''"`
+	Bio            string `json:"Bio,omitempty" gorm:"type:varchar(100);default:''"`
 }
 
 func NewUser(id uint, username, firstname, lastname, phone, password, profilePicture, bio string) *User {

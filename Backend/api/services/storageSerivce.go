@@ -2,6 +2,7 @@ package services
 
 import (
 	"TeleEcho/configs"
+	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -34,6 +35,12 @@ func ConnectS3() error {
 }
 
 func UploadS3(sess *session.Session, fileHeader *multipart.FileHeader, bucket string, ID string) (string, error) {
+	fileSize := fileHeader.Size
+	maxFileSize := int64(10 << 20)
+	if fileSize > maxFileSize {
+		logrus.Printf("File size (%v bytes) exceeds maximum allowed size (%v bytes)\n", fileSize, maxFileSize)
+		return "", errors.New("file too big")
+	}
 	uploader := s3manager.NewUploader(sess)
 	file, err := fileHeader.Open()
 	key := fmt.Sprintf("%s", fileHeader.Filename+ID)
