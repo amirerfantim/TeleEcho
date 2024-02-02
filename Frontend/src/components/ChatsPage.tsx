@@ -27,8 +27,7 @@ const ChatsPage: React.FC = () => {
 
         ws.current.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const filteredData = data.filter((chat: Chat) => chat.user.username);
-            setChats(filteredData);
+            setChats(data);
         };
 
         ws.current.onerror = (error) => {
