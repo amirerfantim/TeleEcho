@@ -24,19 +24,17 @@ TeleEcho is a comprehensive messaging platform built with a Golang backend and a
 ## Screenshots
 
 ### User Registration
-![User Registration](![register](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/9e42e2eb-0f84-4b10-b1f6-6ec77ff5ab3a))
+![User Registration](![register](![register](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/28a64be2-f839-4cd7-9f38-94c27473a6c2)))
 
 ### User Login
-![User Login](![login](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/047f373a-bf78-472d-9e8d-3f42cfb4f065))
-
-### Chat Interface
-![Chat Interface](![chat](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/592e8edc-5036-4477-82ca-d0d7a2a91a89))
-
-### Add New Contact
-![Add New Contact](![contact-added](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/4978b62b-18e5-4413-86bc-20d181dd15bc))
+![User Login](![login](![login](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/7aae7cf5-1d14-455e-b95b-d886f01426ff)))
 
 ### User Profile
-![User Profile](![profile](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/5e4adb66-77ae-436a-928a-ac9702ad669a))
+![User Profile](![profile](![profile](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/2e574838-c399-47ed-8303-413207d099e9)))
+
+### Chat Interface
+![Chat Interface](![chat](![chat](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/75413591-0246-48d6-b3f5-e3af627721f5)))
+
 
 ## Setup Instructions
 
