@@ -25,18 +25,19 @@ TeleEcho is a comprehensive messaging platform built with a Golang backend and a
 
 ### User Registration
 <div style="display: flex; align-items: center;">
-  <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/28a64be2-f839-4cd7-9f38-94c27473a6c2" alt="Chat" width="2000">
+  <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/28a64be2-f839-4cd7-9f38-94c27473a6c2" alt="Chat" width="800">
 </div>
 
 ### User Login
 <div style="display: flex; align-items: center;">
-  <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/7aae7cf5-1d14-455e-b95b-d886f01426ff" alt="Chat" width="2000">
+  <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/7aae7cf5-1d14-455e-b95b-d886f01426ff" alt="Chat" width="800">
 </div>
 
 ### User Profile
 <div style="display: flex; align-items: center;">
   <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/2e574838-c399-47ed-8303-413207d099e9" alt="Profile" width="1000">
 </div>
+
 ### Chat Interface
 <div style="display: flex; align-items: center;">
   <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/75413591-0246-48d6-b3f5-e3af627721f5" alt="Chat" width="1000">
