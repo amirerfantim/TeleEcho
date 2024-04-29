@@ -55,9 +55,9 @@ TeleEcho is a messaging platform built with a Golang backend and a React fronten
   ```
 
 3. **Configuration File**
-  ```
-  Create a `config.yaml` in the `Backend/configs` with the necessary configurations. A template for the `config.yaml` file:
 
+   Create a `config.yaml` in the `Backend/configs` with the necessary configurations. A template for the `config.yaml` file:
+  ```yaml
   port: 8020
   address: localhost
   token-key: 'your-secret-jwt-key-here'
