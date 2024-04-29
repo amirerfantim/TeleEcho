@@ -54,14 +54,28 @@ TeleEcho is a messaging platform built with a Golang backend and a React fronten
   docker run --name postgres -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=pass -e POSTGRES_DB=messenger-db -p 5432:5432 -d postgres
   ```
 
-5. **Configuration File**
-  ```
-  Create a `config.yaml` in the `Backend/configs` with the necessary configurations.
-  ```
 4. **Backend Setup**
   ```
   cd Backend
   go get ./...
+  ```
+
+5. **Configuration File**
+  ```
+  Create a `config.yaml` in the `Backend/configs` with the necessary configurations.
+  ```yaml
+  port: 8020
+  address: localhost
+  token-key: 'your-secret-jwt-key-here'
+  database-port: 5432
+  database-address: localhost
+  database-user: 'database-username-here'
+  database-password: 'database-password-here'
+  database-name: 'messenger-db'
+  storage-service-id: 'your-storage-service-id-here'
+  storage-service-secret: 'your-storage-service-secret-here'
+  storage-service-endpoint: 'https://your-storage-service-endpoint-here'
+  storage-service-bucket: 'your-storage-service-bucket-name-here'
   ```
 
 6. **Frontend Setup**
