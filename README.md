@@ -91,5 +91,5 @@ TeleEcho is a messaging platform built with a Golang backend and a React fronten
   ```
 - For Frontend:
   ```
-  npm start
+  npm run dev
   ```
