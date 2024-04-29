@@ -35,9 +35,6 @@ TeleEcho is a comprehensive messaging platform built with a Golang backend and a
 ### Add New Contact
 ![Add New Contact](![contact-added](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/4978b62b-18e5-4413-86bc-20d181dd15bc))
 
-### Contact Added Successfully
-![Contact Added Notification](![contact](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/327f47a4-4667-46ac-b697-e5f2c61a64f4))
-
 ### User Profile
 ![User Profile](![profile](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/5e4adb66-77ae-436a-928a-ac9702ad669a))
 
