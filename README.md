@@ -24,17 +24,23 @@ TeleEcho is a comprehensive messaging platform built with a Golang backend and a
 ## Screenshots
 
 ### User Registration
-![User Registration](![register](![register](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/28a64be2-f839-4cd7-9f38-94c27473a6c2)))
+<div style="display: flex; align-items: center;">
+  <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/28a64be2-f839-4cd7-9f38-94c27473a6c2" alt="Chat" width="200">
+</div>
 
 ### User Login
-![User Login](![login](![login](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/7aae7cf5-1d14-455e-b95b-d886f01426ff)))
+<div style="display: flex; align-items: center;">
+  <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/7aae7cf5-1d14-455e-b95b-d886f01426ff" alt="Chat" width="200">
+</div>
 
 ### User Profile
-![User Profile](![profile](![profile](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/2e574838-c399-47ed-8303-413207d099e9)))
-
+<div style="display: flex; align-items: center;">
+  <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/2e574838-c399-47ed-8303-413207d099e9" alt="Profile" width="200">
+</div>
 ### Chat Interface
-![Chat Interface](![chat](![chat](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/75413591-0246-48d6-b3f5-e3af627721f5)))
-
+<div style="display: flex; align-items: center;">
+  <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/75413591-0246-48d6-b3f5-e3af627721f5" alt="Chat" width="200">
+</div>
 
 ## Setup Instructions
 
