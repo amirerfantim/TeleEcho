@@ -2,14 +2,14 @@
 
 ## Overview
 
-TeleEcho is a comprehensive messaging platform built with a Golang backend and a React frontend. It features user registration, login, contact management, group creation, and real-time messaging, all secured with JWT for authentication.
+TeleEcho is a messaging platform built with a Golang backend and a React frontend. It features user registration, login, contact management, group creation, and real-time messaging.
 
 ## Technologies Used
 
 - Backend: Golang
 - Frontend: React, TypeScript
 - Database: PostgreSQL
-- Storage: Integration with object storage for media and message data
+- Storage: Integration with object storage for media
 - Authentication: JWT for secure API access
 
 ## Features
@@ -19,7 +19,6 @@ TeleEcho is a comprehensive messaging platform built with a Golang backend and a
 - Real-time one-on-one and group messaging
 - Contact management
 - Group chat creation and management
-- Media file sharing
 
 ## Screenshots
 
