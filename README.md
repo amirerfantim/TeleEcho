@@ -24,17 +24,17 @@ TeleEcho is a messaging platform built with a Golang backend and a React fronten
 
 ### User Registration
 <div style="display: flex; align-items: center;">
-  <img src="![image](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/90c9786d-7fad-4194-ba5d-23ca7564043e)" alt="Chat" width="800">
+  <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/90c9786d-7fad-4194-ba5d-23ca7564043e" alt="Chat" width="1000">
 </div>
 
 ### User Login
 <div style="display: flex; align-items: center;">
-  <img src="![image](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/7aae7cf5-1d14-455e-b95b-d886f01426ff)" alt="Chat" width="800">
+  <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/7aae7cf5-1d14-455e-b95b-d886f01426ff" alt="Chat" width="1000">
 </div>
 
 ### User Profile
 <div style="display: flex; align-items: center;">
-  <img src="![image]([https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/1468cd71-d2ae-4e4d-9237-f901276819ec](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/7aae7cf5-1d14-455e-b95b-d886f01426ff))" alt="Profile" width="1000">
+  <img src="https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/1468cd71-d2ae-4e4d-9237-f901276819ec" alt="Chat" width="1000">
 </div>
 
 ### Chat Interface
