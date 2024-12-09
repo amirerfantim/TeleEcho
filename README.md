@@ -49,16 +49,16 @@ Welcome to **TeleEcho Messenger**, a modern, real-time messaging platform design
 ## 📸 Screenshots
 
 ### User Registration
-![User Registration](https://github.com/amirerfantim/TeleEcho/assets/78559411/90c9786d-7fad-4194-ba5d-23ca7564043e)
+![User Registration](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/90c9786d-7fad-4194-ba5d-23ca7564043e)
 
 ### User Login
-![User Login](https://github.com/amirerfantim/TeleEcho/assets/78559411/7aae7cf5-1d14-455e-b95b-d886f01426ff)
+![User Login](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/7aae7cf5-1d14-455e-b95b-d886f01426ff)
 
 ### User Profile
-![User Profile](https://github.com/amirerfantim/TeleEcho/assets/78559411/1468cd71-d2ae-4e4d-9237-f901276819ec)
+![User Profile](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/1468cd71-d2ae-4e4d-9237-f901276819ec)
 
 ### Chat Interface
-![Chat Interface](https://github.com/amirerfantim/TeleEcho/assets/78559411/75413591-0246-48d6-b3f5-e3af627721f5)
+![Chat Interface](https://github.com/Mohammad-Rahmanian/TeleEcho/assets/78559411/75413591-0246-48d6-b3f5-e3af627721f5)
 
 ---
 
@@ -112,23 +112,8 @@ git clone https://github.com/amirerfantim/TeleEcho
 
 ---
 
-## 💡 Future Enhancements
-- 🔍 **Advanced Search**: Implement advanced search functionalities for chats and contacts.
-- 🤖 **AI Integration**: Add chat moderation and auto-replies with AI.
-- 🔒 **Enhanced Security**: Blockchain-based encryption for end-to-end security.
-- 📊 **User Analytics**: Insights into user activity and trends.
-
----
-
 ## 📧 Connect with Me
 
 - **GitHub**: [amirerfantim](https://github.com/amirerfantim)
 - **LinkedIn**: [Amirerfan Teimoori](https://www.linkedin.com/in/amirerfantim/)
 - **Email**: [amirerfantim@gmail.com](mailto:amirerfantim@gmail.com)
-
----
-
-> "Building a messaging platform that’s fast, reliable, and secure is not just a goal; it’s a mission." – **Amirerfan Teimoori**
-```
-
-This README is professional, visually engaging, and informative, providing clear instructions and showcasing the project's features. Let me know if you'd like to make further tweaks! 🚀
