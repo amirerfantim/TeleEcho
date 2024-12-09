@@ -13,7 +13,6 @@ Welcome to **TeleEcho Messenger**, a modern, real-time messaging platform design
 - **Real-Time Messaging**: Chat one-on-one or in groups with instant message delivery.
 - **Contact Management**: Add, view, and manage your contacts effortlessly.
 - **Group Chats**: Create and manage group conversations with ease.
-- **Media Support**: Share media files securely with object storage integration.
 
 ### 🔒 Security
 - **Authentication**: Powered by JWT for secure and stateless API access.
