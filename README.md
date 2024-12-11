@@ -1,5 +1,3 @@
-Here's a beautiful README for your **TeleEcho Messenger** project:
-
 # 🌐 TeleEcho Messenger
 
 Welcome to **TeleEcho Messenger**, a modern, real-time messaging platform designed for seamless communication. Built with a **Golang** backend and a **React** frontend, TeleEcho delivers a robust and scalable chat experience for individuals and groups. Whether you need secure messaging, contact management, or group chats, TeleEcho has you covered.
